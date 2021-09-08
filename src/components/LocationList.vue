@@ -32,28 +32,33 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
     data: () => {
-        return {
-            locations: []
-        }
+        return {}
+    },
+    computed: {
+        ...mapGetters({
+            locations: 'getLocations'
+        })
     },
     methods: {
-        async fetchLocations() {
-            try {
-                const resp = await axios.get('https://dev-ecoregions.pantheonsite.io/wp-json/wp/v2/location')
-                if ( resp && resp.data ) {
-                    this.locations = resp.data
-                }
-            } catch (error) {
-                console.error(error)
+        ...mapActions({
+            fetchLocations: 'fetchLocations'
+        }),
+        fetchMinimumData() {
+            if ( Array.isArray(this.locations) && !this.locations.length ) {
+                this.fetchLocations().then((resp) => {
+                    console.log(resp)
+                }).catch((err) => {
+                    console.log(err)
+                })
             }
         }
     },
     mounted() {
-        this.fetchLocations()
+        this.fetchMinimumData()
     }
 }
 </script>
