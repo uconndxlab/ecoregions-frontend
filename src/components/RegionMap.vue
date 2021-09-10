@@ -1,14 +1,6 @@
 <template>
     <div class="component-map">
-        <h2>Regions</h2>
-        <ul v-if="regions">
-            <li v-for="region in regions" :key="region.id">
-                <strong>{{ region.name }}</strong>
-                <p>{{ region.overview }}</p>
-            </li>
-        </ul>
-        <p v-else>No regions.</p>
-
+        <region-info ref="region_info"></region-info>
         <div id="main-mapbox"></div>
     </div>
 </template>
@@ -16,8 +8,12 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import mapboxgl from "mapbox-gl";
+import RegionInfo from '@/components/RegionInfo.vue'
 
 export default {
+    components: {
+        RegionInfo
+    },
     data: () => {
         return {
             map: {},
@@ -36,7 +32,8 @@ export default {
                 ],
             },
             zoom_to_coordinate_mappings: {
-                "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
+                "northwestern-uplands": [-73.6477766, 41.7672095],
+                // "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
             },
             selectedRegionSlug: "",
         };
@@ -133,6 +130,7 @@ export default {
             });
 
             this.map.on("click", region.slug, (e) => {
+                
                 new mapboxgl.Popup()
                         .setLngLat(e.lngLat)
                         .setHTML(region.name)
@@ -148,6 +146,8 @@ export default {
                     const locationsInRegion = this.getLocationsInRegion(
                         region.id
                     );
+
+                    this.$refs.region_info.openFlyout(region, locationsInRegion)
 
                     locationsInRegion.forEach((loc) => {
                         console.log("adding marker");
@@ -189,7 +189,7 @@ export default {
 /* For some reason, the above causes issues in some ad blockers (uBlock Origin).  It tries to throw like custom analytics events which prevents load. */
 @import "https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css";
 #main-mapbox {
-    min-height: 600px;
+    min-height: 800px;
 }
 
 .circle {
@@ -206,5 +206,9 @@ export default {
     transform: translate(48%, 48%);
     width: 10px;
     height: 10px;
+}
+
+.component-map {
+    position: relative;
 }
 </style>

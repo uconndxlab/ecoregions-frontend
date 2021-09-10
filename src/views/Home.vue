@@ -1,6 +1,5 @@
 <template>
   <div class="page-home">
-    <h1>Home</h1>
     <region-map></region-map>
   </div>
 </template>
