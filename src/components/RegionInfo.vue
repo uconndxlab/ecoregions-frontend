@@ -1,11 +1,44 @@
 <template>
     <div :class="objclass">
-        <h1 v-if="region.name">{{ region.name }}</h1>
-        <p v-if="region.flavor_text">{{ region.flavor_text }}</p>
-        <p>Overview</p>
-        <p v-if="region.overview" class="overview">{{ region.overview }}</p>
-        <v-btn class="mt-5">Explore &amp; Visit</v-btn>
-    </div>    
+        <div class="flyout-content">
+            <v-btn
+                text
+                @click="step = step - 1"
+                :disabled="step < 2"
+                color="white"
+                class="mb-3"
+            >
+                <v-icon left dark> mdi-chevron-left </v-icon>
+                Back
+            </v-btn>
+            <h1 v-if="region.name" class="mb-3 text-h4">{{ region.name }}</h1>
+            <p v-if="region.flavor_text">{{ region.flavor_text }}</p>
+
+            <div class="step-overview step" v-if="step == 1">
+                <p class="text-button overview-header">Overview</p>
+                <p v-if="region.overview" class="overview">
+                    {{ region.overview }}
+                </p>
+                <v-btn class="mt-5" @click="exploreVisitAction()"
+                    >Explore &amp; Visit</v-btn
+                >
+            </div>
+
+            <div class="step-locations step" v-if="step == 2">
+                <p class="text-button overview-header">Explore &amp; Visit</p>
+                <v-list-item two-line v-for="loc in locations" :key="loc.id" class="location-list-item" dark>
+                    <v-list-item-content>
+                        <v-list-item-title class="location-list-item-title">{{
+                            loc.title.rendered
+                        }}</v-list-item-title>
+                        <v-list-item-subtitle class="location-list-item-flavor">{{
+                            loc.flavor_text
+                        }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -14,39 +47,42 @@ export default {
         return {
             open: false,
             region: {
-                name: '',
-                flavor_text: ''
+                name: "",
+                flavor_text: "",
             },
             locations: [],
-            step: 0
-        }
+            step: 0,
+        };
     },
     computed: {
         objclass() {
-            if ( this.open ) {
-                return 'region-info-flyout'
+            if (this.open) {
+                return "region-info-flyout";
             }
-            return 'region-info-flyout hidden'
-        }
+            return "region-info-flyout hidden";
+        },
     },
     methods: {
         openFlyout(region, locations) {
-            this.region = region
-            this.locations = locations
-            this.open = true
+            this.region = region;
+            this.locations = locations;
+            this.step = 1;
+            this.open = true;
         },
         closeFlyout() {
-            this.open = false
-        }
-    }
-}
+            this.open = false;
+        },
+        exploreVisitAction() {
+            this.step = 2;
+        },
+    },
+};
 </script>
 
 <style scoped>
 .region-info-flyout {
     background: rgba(37, 59, 80, 0.9);
     height: 100%;
-    /* min-width: 400px; */
     max-width: 600px;
     display: block;
     position: absolute;
@@ -55,7 +91,7 @@ export default {
     bottom: 0;
     z-index: 999;
     color: white;
-    padding: 50px;
+    padding: 20px 50px;
 }
 
 .hidden {
@@ -64,6 +100,19 @@ export default {
 
 .region-info-flyout .overview {
     overflow-y: scroll;
+    padding: 8px 8px 8px 0;
+    flex-grow: 1;
     max-height: 60%;
+}
+
+.region-info-flyout .step {
+    position: relative;
+    height: 100%;
+}
+
+.flyout-content {
+    display: block;
+    position: relative;
+    height: 100%;
 }
 </style>
