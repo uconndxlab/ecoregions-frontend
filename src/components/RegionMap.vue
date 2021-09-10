@@ -2,10 +2,7 @@
     <div class="component-map">
         <h2>Regions</h2>
         <ul v-if="regions">
-            <li
-                v-for="region in regions"
-                :key="region.id"
-            >
+            <li v-for="region in regions" :key="region.id">
                 <strong>{{ region.name }}</strong>
                 <p>{{ region.overview }}</p>
             </li>
@@ -17,44 +14,15 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import mapboxgl from 'mapbox-gl'
+import { mapGetters, mapActions } from "vuex";
+import mapboxgl from "mapbox-gl";
 
 export default {
     data: () => {
         return {
-            map: {}
-        }
-    },
-    computed: {
-        ...mapGetters({
-            regions: 'getRegions'
-        })
-    },
-    methods: {
-        ...mapActions({
-            fetchRegions: 'fetchRegions'
-        }),
-        fetchMinimumData() {
-            if ( Array.isArray(this.regions) && !this.regions.length ) {
-                this.fetchRegions().then((resp) => {
-                    console.log(resp)
-                }).catch((err) => {
-                    console.log(err)
-                })
-            }
-        },
-        initializeMap() {
-            mapboxgl.accessToken = "pk.eyJ1IjoidWNvbm5keGdyb3VwIiwiYSI6ImNrcTg4dWc5NzBkcWYyd283amtpNjFiZXkifQ.iGpZ5PfDWFWWPkuDeGQ3NQ"
-            this.map = new mapboxgl.Map({
-                container: 'main-mapbox',
-                style: 'mapbox://styles/mapbox/outdoors-v11',
-                center: [-72.7457, 41.6215],
-                zoom: 8
-            })
-
-            this.map.on('load', () => {
-                this.addMapPolygon('northwest_uplands', [
+            map: {},
+            region_coordinate_mappings: {
+                "northwestern-uplands": [
                     [-72.82161082594858, 42.035933621864295],
                     [-73.4873136457728, 42.049446888173385],
                     [-73.53535710341936, 41.44558860831884],
@@ -64,69 +32,179 @@ export default {
                     [-73.01510758315594, 41.775084941678145],
                     [-72.96719934136044, 41.82676315673198],
                     [-72.8725992050337, 41.837486521688604],
-                    [-72.84438786871107, 41.95087354088623]
-                ])
-            })
+                    [-72.84438786871107, 41.95087354088623],
+                ],
+            },
+            zoom_to_coordinate_mappings: {
+                "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
+            },
+            selectedRegionSlug: "",
+        };
+    },
+    computed: {
+        ...mapGetters({
+            regions: "getRegions",
+            locations: "getLocations",
+        }),
+    },
+    methods: {
+        ...mapActions({
+            fetchRegions: "fetchRegions",
+            fetchLocations: "fetchLocations",
+        }),
+        fetchMinimumData() {
+            if (Array.isArray(this.regions) && !this.regions.length) {
+                this.fetchRegions()
+                    .then((resp) => {
+                        console.log(resp);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
 
+            if (Array.isArray(this.locations) && !this.locations.length) {
+                this.fetchLocations()
+                    .then((resp) => {
+                        console.log(resp);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
         },
-        addMapPolygon( id, coordinates ) {
-            const outline_id = id + '_outline'
-            this.map.addSource(id, {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Polygon',
-                        'coordinates': [
-                            coordinates
-                        ]
-                    }
+        initializeMap() {
+            mapboxgl.accessToken =
+                "pk.eyJ1IjoidWNvbm5keGdyb3VwIiwiYSI6ImNrcTg4dWc5NzBkcWYyd283amtpNjFiZXkifQ.iGpZ5PfDWFWWPkuDeGQ3NQ";
+            this.map = new mapboxgl.Map({
+                container: "main-mapbox",
+                style: "mapbox://styles/mapbox/outdoors-v11",
+                center: [-72.7457, 41.6215],
+                zoom: 8,
+            });
+
+            this.map.on("load", () => {
+                if (Array.isArray(this.regions)) {
+                    this.regions.forEach((region) => {
+                        const coords =
+                            this.region_coordinate_mappings[region.slug];
+                        const centerpoint =
+                            this.zoom_to_coordinate_mappings[region.slug];
+                        if (coords && centerpoint) {
+                            this.addMapPolygon(region, coords, centerpoint);
+                        }
+                    });
                 }
-            })
+            });
+        },
+        addMapPolygon(region, coordinates, centerpoint) {
+            const outline_id = region.slug + "_outline";
+            this.map.addSource(region.slug, {
+                type: "geojson",
+                data: {
+                    type: "Feature",
+                    geometry: {
+                        type: "Polygon",
+                        coordinates: [coordinates],
+                    },
+                },
+            });
 
             this.map.addLayer({
-                'id': id,
-                'type': 'fill',
-                'source': id,
-                'layout': {},
-                'paint': {
-                    'fill-color': '#628547',
-                    'fill-opacity': 0.3
-                }
-            })
+                id: region.slug,
+                type: "fill",
+                source: region.slug,
+                layout: {},
+                paint: {
+                    "fill-color": "#628547",
+                    "fill-opacity": 0.3,
+                },
+            });
 
             this.map.addLayer({
-                'id': outline_id,
-                'type': 'line',
-                'source': id,
-                'layout': {},
-                'paint': {
-                    'line-color': '#628547',
-                    'line-width': 2
-                }
-            })
+                id: outline_id,
+                type: "line",
+                source: region.slug,
+                layout: {},
+                paint: {
+                    "line-color": "#628547",
+                    "line-width": 2,
+                },
+            });
 
-            this.map.on('click', id, (e) => {
-                console.log(e)
+            this.map.on("click", region.slug, (e) => {
                 new mapboxgl.Popup()
-                    .setLngLat(e.lngLat)
-                    .setHTML(id)
-                    .addTo(this.map)
-            })
-        }
+                        .setLngLat(e.lngLat)
+                        .setHTML(region.name)
+                        .addTo(this.map);
+                if (this.selectedRegionSlug !== region.slug) {
+                    this.selectedRegionSlug = region.slug;
+                    this.map.easeTo({
+                        center: centerpoint,
+                        zoom: 9,
+                        duration: 1000,
+                    });
+
+                    const locationsInRegion = this.getLocationsInRegion(
+                        region.id
+                    );
+
+                    locationsInRegion.forEach((loc) => {
+                        console.log("adding marker");
+                        const circle = document.createElement("div");
+                        const inner_circle = document.createElement("div");
+                        circle.className = "circle";
+                        inner_circle.className = "inner_circle";
+                        circle.appendChild(inner_circle);
+                        const el = document.createElement("div");
+                        el.appendChild(circle);
+                        el.className = "marker";
+                        el.style.width = "30px";
+                        el.style.height = "30px";
+
+                        new mapboxgl.Marker(el)
+                            .setLngLat([loc.longitude, loc.latitude])
+                            .addTo(this.map);
+                    });
+                }
+            });
+        },
+        getLocationsInRegion(region_id) {
+            return Array.from(
+                this.locations.filter((x) => {
+                    return x.region.includes(region_id);
+                })
+            );
+        },
     },
     mounted() {
-        this.fetchMinimumData()
-        this.initializeMap()
-    }
-}
+        this.fetchMinimumData();
+        this.initializeMap();
+    },
+};
 </script>
 
-<style scoped>
+<style>
 /* @import '~mapbox-gl/dist/mapbox-gl.css'; */
 /* For some reason, the above causes issues in some ad blockers (uBlock Origin).  It tries to throw like custom analytics events which prevents load. */
-@import 'https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css';
+@import "https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css";
 #main-mapbox {
     min-height: 600px;
+}
+
+.circle {
+    border-radius: 50%;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+}
+
+.inner_circle {
+    border-radius: 50%;
+    background-color: #628547;
+    transform: translate(48%, 48%);
+    width: 10px;
+    height: 10px;
 }
 </style>
