@@ -129,12 +129,8 @@ export default {
                 },
             });
 
-            this.map.on("click", region.slug, (e) => {
-                
-                new mapboxgl.Popup()
-                        .setLngLat(e.lngLat)
-                        .setHTML(region.name)
-                        .addTo(this.map);
+            // Can pass 'event' to this callback function, for access to clicked properties such as event.lngLat
+            this.map.on("click", region.slug, () => {
                 if (this.selectedRegionSlug !== region.slug) {
                     this.selectedRegionSlug = region.slug;
                     this.map.easeTo({
