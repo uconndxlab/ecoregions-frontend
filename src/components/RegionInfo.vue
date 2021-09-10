@@ -26,16 +26,19 @@
 
             <div class="step-locations step" v-if="step == 2">
                 <p class="text-button overview-header">Explore &amp; Visit</p>
-                <v-list-item two-line v-for="loc in locations" :key="loc.id" class="location-list-item" dark>
-                    <v-list-item-content>
-                        <v-list-item-title class="location-list-item-title">{{
-                            loc.title.rendered
-                        }}</v-list-item-title>
-                        <v-list-item-subtitle class="location-list-item-flavor">{{
-                            loc.flavor_text
-                        }}</v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
+                <v-list-item-group v-model="highlightedLocationIndex">
+                    <v-list-item two-line v-for="loc in locations" :key="loc.id" class="location-list-item" dark @mouseover="emitListHighlightEvent(loc)" @mouseout="emitListDeHighlightEvent(loc)">
+                        <v-list-item-content>
+                            <v-list-item-title class="location-list-item-title">{{
+                                loc.title.rendered
+                            }}</v-list-item-title>
+                            <v-list-item-subtitle class="location-list-item-flavor">{{
+                                loc.flavor_text
+                            }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list-item-group>
+                
             </div>
         </div>
     </div>
@@ -52,6 +55,7 @@ export default {
             },
             locations: [],
             step: 0,
+            highlightedLocationIndex: -1
         };
     },
     computed: {
@@ -75,6 +79,17 @@ export default {
         exploreVisitAction() {
             this.step = 2;
         },
+        setHighlight(index) {
+            this.highlightedLocationIndex = index
+        },
+        emitListHighlightEvent(location) {
+            console.log('from component', location)
+            this.$emit('locationListHighlight', location);
+        },
+        emitListDeHighlightEvent(location) {
+            console.log('from component', location)
+            this.$emit('locationListDeHighlight', location);
+        }
     },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div class="component-map">
-        <region-info ref="region_info"></region-info>
+        <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent"></region-info>
         <div id="main-mapbox"></div>
     </div>
 </template>
@@ -35,7 +35,7 @@ export default {
                 "northwestern-uplands": [-73.6477766, 41.7672095],
                 // "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
             },
-            selectedRegionSlug: "",
+            selectedRegionSlug: ""
         };
     },
     computed: {
@@ -157,6 +157,17 @@ export default {
                         el.className = "marker";
                         el.style.width = "30px";
                         el.style.height = "30px";
+                        el.dataset.locationid = loc.id
+
+                        el.addEventListener('mouseover', () => {
+                            el.className = "marker highlighted"
+                            this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
+                        })
+
+                        el.addEventListener('mouseout', () => {
+                            el.className = "marker"
+                            this.$refs.region_info.setHighlight(-1)
+                        })
 
                         new mapboxgl.Marker(el)
                             .setLngLat([loc.longitude, loc.latitude])
@@ -172,6 +183,19 @@ export default {
                 })
             );
         },
+        listHighlightEvent(location) {
+            console.log('location', location)
+            const list = document.querySelectorAll(`[data-locationid='${location.id}`)
+            for (var i = 0; i < list.length; ++i) {
+                list[i].classList.add('highlighted');
+            }
+        },
+        listDeHighlightEvent(location) {
+            const list = document.querySelectorAll(`[data-locationid='${location.id}`)
+            for (var i = 0; i < list.length; ++i) {
+                list[i].classList.remove('highlighted');
+            }
+        }
     },
     mounted() {
         this.fetchMinimumData();
@@ -194,6 +218,16 @@ export default {
     width: 20px;
     height: 20px;
     background-color: white;
+    transition: transform 0.2s;
+}
+
+.highlighted .circle {
+    transform: scale(1.5);
+    transform-origin: center center;
+}
+.highlighted .inner_circle {
+    transform: scale(1.3) translate(38%, 38%);
+    transform-origin: center center;
 }
 
 .inner_circle {
@@ -202,6 +236,7 @@ export default {
     transform: translate(48%, 48%);
     width: 10px;
     height: 10px;
+    transition: transform 0.2s;
 }
 
 .component-map {
