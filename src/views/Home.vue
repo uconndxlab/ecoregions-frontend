@@ -1,15 +1,18 @@
 <template>
   <div class="page-home">
     <region-map></region-map>
+    <content-tabs></content-tabs>
   </div>
 </template>
 
 <script>
 import RegionMap from '@/components/RegionMap.vue'
+import ContentTabs from '@/components/ContentTabs.vue'
 
 export default {
   components: {
     RegionMap,
+    ContentTabs
   },
   data: () => {
     return {}
