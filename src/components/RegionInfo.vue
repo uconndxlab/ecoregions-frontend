@@ -28,7 +28,8 @@
                 <h6 class="text-h6 mb-6">Explore &amp; Visit</h6>
                 <v-list-item-group v-model="highlightedLocationIndex">
                     <template v-for="loc in locations">
-                    <v-list-item two-line :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)">
+                    <v-list-item two-line :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)"
+                    @click="setContentTabsForLocation(loc)">
                         <v-list-item-content>
                             <v-list-item-title class="location-list-item-title text-h5 mb-4 mt-3">{{
                                 loc.title.rendered
@@ -47,6 +48,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
     data: () => {
         return {
@@ -69,6 +72,9 @@ export default {
         },
     },
     methods: {
+        ...mapMutations({
+            setTabContent: 'SET_CONTENT_TABS'
+        }),
         openFlyout(region, locations) {
             this.region = region;
             this.locations = locations;

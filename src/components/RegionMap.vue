@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import mapboxgl from "mapbox-gl";
 import RegionInfo from '@/components/RegionInfo.vue'
 
@@ -42,13 +42,16 @@ export default {
     computed: {
         ...mapGetters({
             regions: "getRegions",
-            locations: "getLocations",
+            locations: "getLocations"
         }),
     },
     methods: {
         ...mapActions({
             fetchRegions: "fetchRegions",
             fetchLocations: "fetchLocations",
+        }),
+        ...mapMutations({
+            setTabContent: "SET_CONTENT_TABS"
         }),
         fetchMinimumData() {
             if (Array.isArray(this.regions) && !this.regions.length) {
@@ -140,7 +143,18 @@ export default {
                         duration: 1000,
                     });
 
-                    const locationsInRegion = this.getLocationsInRegion( region.id );
+                    this.setTabContent([{
+                        title: 'Conversations With',
+                        content: '<p>Video with content supporting the selected Visit and Explore sites.  Topics cover geology, climate, vegetation, biology, ecology/conservation, archaeology/history, and Native Americans.</p>'
+                    },{
+                        title: 'Further Your Exploration',
+                        content: '<p>Links to other sites of interest in the region especially hiking trails, archaeological sites, and natural history related education centers.</p>'
+                    },{
+                        title: 'Community Content',
+                        content: '<p>Coming soon.</p>'
+                    }])
+
+                    const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
 
                     this.$refs.region_info.openFlyout(region, locationsInRegion)
 

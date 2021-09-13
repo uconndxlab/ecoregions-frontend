@@ -1,33 +1,15 @@
 <template>
     <div class="component-location-list">
-        <h2>Locations</h2>
-        <ul v-if="locations">
-            <li
-                v-for="loc in locations"
-                :key="'loc'+loc.id"
-            >
-                <strong>{{ loc.title.rendered }}</strong>
-                <p>{{ loc.flavor_text }}</p>
-
-                <h3>Conversations With</h3>
-                <ul v-if="loc.conversations">
-                    <li v-for="conv in loc.conversations" :key="'conv'+conv.id">
-                        <em>{{ conv.speaker }}</em>
-                        <strong>{{ conv.post_title }}</strong>
-                        <p>{{ conv.post_content }}</p>
-                        <p>{{ conv.video_link }}</p>
-                    </li>
-                </ul>
-
-                <h3>Further Your Exploration</h3>
-                <ul v-if="loc.explorations">
-                    <li v-for="expl in loc.explorations" :key="'expl'+expl.id">
-                        <strong>{{ expl.post_title }}</strong>
-                        <p>{{ expl.post_content }}</p>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <v-select
+            :items="locations"
+            v-model="selected"
+            filled
+            item-text="title.rendered"
+            item-value="title.rendered"
+            max-width="600"
+            placeholder="Select a Location"
+            class="component-location-list-select"
+        ></v-select>
     </div>
 </template>
 
@@ -36,11 +18,15 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
     data: () => {
-        return {}
+        return {
+            region: 0,
+            locations: [],
+            selected: {}
+        }
     },
     computed: {
         ...mapGetters({
-            locations: 'getLocations'
+            allLocations: 'getLocations'
         })
     },
     methods: {
@@ -49,11 +35,19 @@ export default {
         }),
         fetchMinimumData() {
             if ( Array.isArray(this.locations) && !this.locations.length ) {
-                this.fetchLocations().then((resp) => {
-                    console.log(resp)
+                this.fetchLocations().then(() => {
+                    this.locations = this.allLocations
+                    this.selected = this.locations[0]
                 }).catch((err) => {
                     console.log(err)
                 })
+            }
+        },
+        updateWithRegion(region_id = 0) {
+            if ( region_id > 0 ) {
+                this.locations = this.$store.getters.getLocationsForRegion(region_id)
+                this.region = region_id
+                this.selected = this.locations[0]
             }
         }
     },
@@ -62,3 +56,32 @@ export default {
     }
 }
 </script>
+
+<style>
+.component-location-list .v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot {
+    padding-left: 32px;
+    padding-right: 32px;
+    border-radius: 33px;
+}
+
+.component-location-list .v-text-field--filled > .v-input__control > .v-input__slot,
+.component-location-list .v-text-field--filled:not(.v-input--is-focused):not(.v-input--has-state) > .v-input__control > .v-input__slot:hover {
+    background: #6AA140 !important;
+}
+
+.component-location-list .v-text-field--filled > .v-input__control > .v-input__slot .v-select__selections {
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+}
+
+.component-location-list .v-icon,
+.component-location-list .v-icon.primary--text {
+    color: white !important;
+}
+
+.component-location-list .v-text-field > .v-input__control > .v-input__slot:before,
+.component-location-list .v-text-field > .v-input__control > .v-input__slot:after {
+    border-width: 0;
+}
+</style>

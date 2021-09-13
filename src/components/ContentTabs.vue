@@ -1,9 +1,9 @@
 <template>
-    <div class="content-tabs">
+    <div class="content-tabs" v-if="content_tabs">
         <v-tabs
             v-model="current_tab"
             centered
-            class="content-tabs-tabselect"
+            class="content-tabs-tabselect mb-10"
             background-color="transparent"
         >
             <v-tabs-slider color="transparent"></v-tabs-slider>
@@ -18,31 +18,65 @@
             
         </v-tabs>
 
-        <v-tabs-items v-model="current_tab">
-            <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
-                <div v-html="ct.content" class="tab-content"></div>
-            </v-tab-item>
-        </v-tabs-items>
+        <v-container>
+            <v-row align="center" justify="center" v-if="show_locations">
+                <v-col md="6">
+                    <location-list></location-list>
+                </v-col>
+            </v-row>
+            <v-row align="center" justify="center">
+                <v-col>
+                    <v-tabs-items v-model="current_tab">
+                        <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
+                            <div v-html="ct.content" class="tab-content"></div>
+                        </v-tab-item>
+                    </v-tabs-items>
+                </v-col>
+            </v-row>
+        </v-container>
+
+        
     </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+import LocationList from '@/components/LocationList.vue'
+
 export default {
+    components: { LocationList },
+    props: {
+        requests: Array
+    },
     data: () => {
         return {
             current_tab: null,
-            content_tabs: [
-                {
-                    title: 'Introduction',
-                    content: `<h3>An Introduction to Ecological Regions and Geological Features of Connecticut</h3>
-                    <p>From one corner to another …… observant passengers traveling in a vehicle following a diagonal route from the town of Stonington, along the southeastern coast of the state, to the town of Salisbury, in the northwestern corner, would notice a myriad of changes as they traverse the landscape.  From standing on the shore and gazing out over Long Island Sound, our travelers would leave the ocean-scented air of the coast, and rise in elevation from less than 100 feet to over 1,500 feet.  They would drive through rural, suburban and urban communities. And, although they would travel through many acres of forest, the presence of numerous stone walls would serve as a reminder of a not-so-distant past when trees did not dominant the land.</p>`
-                },
-                {
-                    title: 'Introduction Two',
-                    content: `<h3>An Introduction to Ecological Regions and Geological Features of Connecticut</h3>
-                    <p>From one corner to another …… observant passengers traveling in a vehicle following a diagonal route from the town of Stonington, along the southeastern coast of the state, to the town of Salisbury, in the northwestern corner, would notice a myriad of changes as they traverse the landscape.  From standing on the shore and gazing out over Long Island Sound, our travelers would leave the ocean-scented air of the coast, and rise in elevation from less than 100 feet to over 1,500 feet.  They would drive through rural, suburban and urban communities. And, although they would travel through many acres of forest, the presence of numerous stone walls would serve as a reminder of a not-so-distant past when trees did not dominant the land.</p>`
-                }
-            ]
+            show_locations: true
+        }
+    },
+    computed: {
+        ...mapGetters({
+            content_tabs: 'getContentTabs'
+        })
+    },
+    methods: {
+        ...mapActions({
+            fetchContentForTabs: 'fetchPageContentForTabs'
+        }),
+        fetchContentBySlugs(slug_array) {
+            this.fetchContentForTabs(slug_array)
+        },
+        enableLocationList() {
+            this.show_locations = true
+        },
+        disableLocationList() {
+            this.show_locations = false
+        }
+    },
+    created() {
+        if ( this.requests ) {
+            console.log(this.requests)
+            this.fetchContentForTabs(this.requests)
         }
     }
 }

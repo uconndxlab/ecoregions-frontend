@@ -1,7 +1,7 @@
 <template>
   <div class="page-home">
     <region-map></region-map>
-    <content-tabs></content-tabs>
+    <content-tabs :requests="content_tab_page_slugs"></content-tabs>
   </div>
 </template>
 
@@ -15,7 +15,9 @@ export default {
     ContentTabs
   },
   data: () => {
-    return {}
+    return {
+      content_tab_page_slugs: ['introduction', 'about']
+    }
   }
 }
 </script>
