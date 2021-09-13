@@ -106,7 +106,7 @@ export default {
     bottom: 0;
     z-index: 999;
     color: white;
-    padding: 20px 50px;
+    padding: 20px 50px 150px;
 }
 
 .hidden {
