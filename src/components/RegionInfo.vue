@@ -12,11 +12,11 @@
                 Back
             </v-btn>
             <h1 v-if="region.name" class="mb-3 text-h4">{{ region.name }}</h1>
-            <p v-if="region.flavor_text">{{ region.flavor_text }}</p>
+            <p v-if="region.flavor_text" class="mb-8">{{ region.flavor_text }}</p>
 
             <div class="step-overview step" v-if="step == 1">
-                <p class="text-button overview-header">Overview</p>
-                <p v-if="region.overview" class="overview">
+                <h6 class="text-h6 mb-6">Overview</h6>
+                <p v-if="region.overview" class="overview text-body-1">
                     {{ region.overview }}
                 </p>
                 <v-btn class="mt-5" @click="exploreVisitAction()"
@@ -25,20 +25,22 @@
             </div>
 
             <div class="step-locations step" v-if="step == 2">
-                <p class="text-button overview-header">Explore &amp; Visit</p>
+                <h6 class="text-h6 mb-6">Explore &amp; Visit</h6>
                 <v-list-item-group v-model="highlightedLocationIndex">
-                    <v-list-item two-line v-for="loc in locations" :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)">
+                    <template v-for="loc in locations">
+                    <v-list-item two-line :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)">
                         <v-list-item-content>
-                            <v-list-item-title class="location-list-item-title">{{
+                            <v-list-item-title class="location-list-item-title text-h5 mb-4 mt-3">{{
                                 loc.title.rendered
                             }}</v-list-item-title>
-                            <v-list-item-subtitle class="location-list-item-flavor">{{
+                            <v-list-item-subtitle class="location-list-item-flavor"><p class="text-body-1 white--text">{{
                                 loc.flavor_text
-                            }}</v-list-item-subtitle>
+                            }}</p></v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
+                    <v-divider dark :key="'div'+loc.id"></v-divider>
+                    </template>
                 </v-list-item-group>
-                
             </div>
         </div>
     </div>
@@ -127,5 +129,14 @@ export default {
     display: block;
     position: relative;
     height: 100%;
+}
+
+.overview-header {
+    text-transform: uppercase;
+}
+
+.location-list-item-title, .location-list-item-flavor {
+    text-overflow: normal;
+    white-space: normal;
 }
 </style>

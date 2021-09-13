@@ -1,5 +1,6 @@
 <template>
     <div class="component-map">
+        <v-alert class="info-alert" v-if="selectedRegionSlug === ''">Select a region to begin.</v-alert>
         <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent"></region-info>
         <div id="main-mapbox"></div>
     </div>
@@ -144,12 +145,15 @@ export default {
                     this.$refs.region_info.openFlyout(region, locationsInRegion)
 
                     locationsInRegion.forEach((loc) => {
-                        console.log("adding marker");
                         const circle = document.createElement("div");
-                        const inner_circle = document.createElement("div");
                         circle.className = "circle";
+
+                        const inner_circle = document.createElement("div");
                         inner_circle.className = "inner_circle";
+                        
                         circle.appendChild(inner_circle);
+
+                        // Marker container.
                         const el = document.createElement("div");
                         el.appendChild(circle);
                         el.className = "marker";
@@ -175,7 +179,6 @@ export default {
                             .setLngLat([loc.longitude, loc.latitude])
                             .setPopup(pop)
                             .addTo(this.map);
-                        
                     });
                 }
             });
@@ -188,14 +191,12 @@ export default {
             );
         },
         listHighlightEvent(location) {
-            console.log('highlighting')
             const list = document.querySelectorAll(`[data-locationid='${location.id}`)
             for (var i = 0; i < list.length; ++i) {
                 list[i].classList.add('highlighted');
             }
         },
         listDeHighlightEvent(location) {
-            console.log('dehighlighting')
             const list = document.querySelectorAll(`[data-locationid='${location.id}`)
             for (var i = 0; i < list.length; ++i) {
                 list[i].classList.remove('highlighted');
@@ -246,5 +247,20 @@ export default {
 
 .component-map {
     position: relative;
+}
+</style>
+
+<style scoped>
+.info-alert {
+    background-color: rgba(37, 59, 80, 0.8);
+    font-size: 16px;
+    color: white;
+    display: inline-block;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 1;
+    padding-left: 35px;
+    padding-right: 35px;
 }
 </style>

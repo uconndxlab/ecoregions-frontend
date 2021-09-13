@@ -1,24 +1,3 @@
-# ecoregions-frontend
+Working Font Stylesheet:
 
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+https://fonts.google.com/share?selection.family=Open%20Sans:ital,wght@0,400;0,600;1,400%7CRaleway:wght@500;600
