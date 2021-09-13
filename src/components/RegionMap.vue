@@ -139,9 +139,7 @@ export default {
                         duration: 1000,
                     });
 
-                    const locationsInRegion = this.getLocationsInRegion(
-                        region.id
-                    );
+                    const locationsInRegion = this.getLocationsInRegion( region.id );
 
                     this.$refs.region_info.openFlyout(region, locationsInRegion)
 
@@ -159,19 +157,25 @@ export default {
                         el.style.height = "30px";
                         el.dataset.locationid = loc.id
 
-                        el.addEventListener('mouseover', () => {
-                            el.className = "marker highlighted"
+                        el.addEventListener('mouseenter', () => {
+                            el.classList.add('highlighted')
                             this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
                         })
 
-                        el.addEventListener('mouseout', () => {
-                            el.className = "marker"
+                        el.addEventListener('mouseleave', () => {
+                            el.classList.remove('highlighted')
                             this.$refs.region_info.setHighlight(-1)
                         })
 
+                        const pop = new mapboxgl.Popup({
+                            offset: [-5, -15]
+                        }).setText(loc.title.rendered)
+
                         new mapboxgl.Marker(el)
                             .setLngLat([loc.longitude, loc.latitude])
+                            .setPopup(pop)
                             .addTo(this.map);
+                        
                     });
                 }
             });
@@ -184,13 +188,14 @@ export default {
             );
         },
         listHighlightEvent(location) {
-            console.log('location', location)
+            console.log('highlighting')
             const list = document.querySelectorAll(`[data-locationid='${location.id}`)
             for (var i = 0; i < list.length; ++i) {
                 list[i].classList.add('highlighted');
             }
         },
         listDeHighlightEvent(location) {
+            console.log('dehighlighting')
             const list = document.querySelectorAll(`[data-locationid='${location.id}`)
             for (var i = 0; i < list.length; ++i) {
                 list[i].classList.remove('highlighted');

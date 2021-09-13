@@ -27,7 +27,7 @@
             <div class="step-locations step" v-if="step == 2">
                 <p class="text-button overview-header">Explore &amp; Visit</p>
                 <v-list-item-group v-model="highlightedLocationIndex">
-                    <v-list-item two-line v-for="loc in locations" :key="loc.id" class="location-list-item" dark @mouseover="emitListHighlightEvent(loc)" @mouseout="emitListDeHighlightEvent(loc)">
+                    <v-list-item two-line v-for="loc in locations" :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)">
                         <v-list-item-content>
                             <v-list-item-title class="location-list-item-title">{{
                                 loc.title.rendered
@@ -83,11 +83,9 @@ export default {
             this.highlightedLocationIndex = index
         },
         emitListHighlightEvent(location) {
-            console.log('from component', location)
             this.$emit('locationListHighlight', location);
         },
         emitListDeHighlightEvent(location) {
-            console.log('from component', location)
             this.$emit('locationListDeHighlight', location);
         }
     },
