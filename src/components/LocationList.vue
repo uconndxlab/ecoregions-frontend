@@ -1,5 +1,5 @@
 <template>
-    <div class="component-location-list">
+    <div class="component-location-list" v-if="locations && locations.length > 0">
         <v-select
             :items="locations"
             v-model="selected"

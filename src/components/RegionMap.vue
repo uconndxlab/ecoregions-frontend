@@ -12,6 +12,9 @@ import mapboxgl from "mapbox-gl";
 import RegionInfo from '@/components/RegionInfo.vue'
 
 export default {
+    props: {
+        start: String
+    },
     components: {
         RegionInfo
     },
@@ -36,7 +39,8 @@ export default {
                 "northwestern-uplands": [-73.6477766, 41.7672095],
                 // "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
             },
-            selectedRegionSlug: ""
+            selectedRegionSlug: "",
+            markers: []
         };
     },
     computed: {
@@ -85,20 +89,26 @@ export default {
             });
 
             this.map.on("load", () => {
+                let start_region_obj = {}
                 if (Array.isArray(this.regions)) {
                     this.regions.forEach((region) => {
                         const coords =
                             this.region_coordinate_mappings[region.slug];
-                        const centerpoint =
-                            this.zoom_to_coordinate_mappings[region.slug];
-                        if (coords && centerpoint) {
-                            this.addMapPolygon(region, coords, centerpoint);
+                        if ( this.start && region.slug === this.start ) {
+                            start_region_obj = region
+                        }
+                        if (coords) {
+                            this.addMapPolygon(region, coords);
                         }
                     });
+
+                    if ( start_region_obj && start_region_obj.slug ) {
+                        this.onRegionClick(start_region_obj)
+                    }
                 }
             });
         },
-        addMapPolygon(region, coordinates, centerpoint) {
+        addMapPolygon(region, coordinates) {
             const outline_id = region.slug + "_outline";
             this.map.addSource(region.slug, {
                 type: "geojson",
@@ -135,67 +145,77 @@ export default {
 
             // Can pass 'event' to this callback function, for access to clicked properties such as event.lngLat
             this.map.on("click", region.slug, () => {
-                if (this.selectedRegionSlug !== region.slug) {
-                    this.selectedRegionSlug = region.slug;
-                    this.map.easeTo({
-                        center: centerpoint,
-                        zoom: 9,
-                        duration: 1000,
-                    });
-
-                    this.setTabContent([{
-                        title: 'Conversations With',
-                        content: '<p>Video with content supporting the selected Visit and Explore sites.  Topics cover geology, climate, vegetation, biology, ecology/conservation, archaeology/history, and Native Americans.</p>'
-                    },{
-                        title: 'Further Your Exploration',
-                        content: '<p>Links to other sites of interest in the region especially hiking trails, archaeological sites, and natural history related education centers.</p>'
-                    },{
-                        title: 'Community Content',
-                        content: '<p>Coming soon.</p>'
-                    }])
-
-                    const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
-
-                    this.$refs.region_info.openFlyout(region, locationsInRegion)
-
-                    locationsInRegion.forEach((loc) => {
-                        const circle = document.createElement("div");
-                        circle.className = "circle";
-
-                        const inner_circle = document.createElement("div");
-                        inner_circle.className = "inner_circle";
-                        
-                        circle.appendChild(inner_circle);
-
-                        // Marker container.
-                        const el = document.createElement("div");
-                        el.appendChild(circle);
-                        el.className = "marker";
-                        el.style.width = "30px";
-                        el.style.height = "30px";
-                        el.dataset.locationid = loc.id
-
-                        el.addEventListener('mouseenter', () => {
-                            el.classList.add('highlighted')
-                            this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
-                        })
-
-                        el.addEventListener('mouseleave', () => {
-                            el.classList.remove('highlighted')
-                            this.$refs.region_info.setHighlight(-1)
-                        })
-
-                        const pop = new mapboxgl.Popup({
-                            offset: [-5, -15]
-                        }).setText(loc.title.rendered)
-
-                        new mapboxgl.Marker(el)
-                            .setLngLat([loc.longitude, loc.latitude])
-                            .setPopup(pop)
-                            .addTo(this.map);
-                    });
+                if ( this.selectedRegionSlug ) {
+                    return false;
                 }
-            });
+
+                if ( this.$route.path !== '/region/' + region.slug ) {
+                    history.pushState({}, null, '/region/' + region.slug)
+                }
+
+                this.selectedRegionSlug = region.slug;
+                this.map.easeTo({
+                    center: this.zoom_to_coordinate_mappings[region.slug],
+                    zoom: 9,
+                    duration: 1000,
+                });
+
+                this.setTabContent([{
+                    title: 'Conversations With',
+                    content: '<p>Video with content supporting the selected Visit and Explore sites.  Topics cover geology, climate, vegetation, biology, ecology/conservation, archaeology/history, and Native Americans.</p>'
+                },{
+                    title: 'Further Your Exploration',
+                    content: '<p>Links to other sites of interest in the region especially hiking trails, archaeological sites, and natural history related education centers.</p>'
+                },{
+                    title: 'Community Content',
+                    content: '<p>Coming soon.</p>'
+                }])
+
+                const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
+
+                this.$refs.region_info.openFlyout(region, locationsInRegion)
+
+                locationsInRegion.forEach((loc) => {
+                    const circle = document.createElement("div");
+                    circle.className = "circle";
+
+                    const inner_circle = document.createElement("div");
+                    inner_circle.className = "inner_circle";
+                    
+                    circle.appendChild(inner_circle);
+
+                    // Marker container.
+                    const el = document.createElement("div");
+                    el.appendChild(circle);
+                    el.className = "marker";
+                    el.style.width = "30px";
+                    el.style.height = "30px";
+                    el.dataset.locationid = loc.id
+
+                    el.addEventListener('mouseenter', () => {
+                        el.classList.add('highlighted')
+                        this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
+                    })
+
+                    el.addEventListener('mouseleave', () => {
+                        el.classList.remove('highlighted')
+                        this.$refs.region_info.setHighlight(-1)
+                    })
+
+                    const pop = new mapboxgl.Popup({
+                        offset: [-5, -15]
+                    }).setText(loc.title.rendered)
+
+                    const m = new mapboxgl.Marker(el)
+                        .setLngLat([loc.longitude, loc.latitude])
+                        .setPopup(pop)
+                        .addTo(this.map);
+
+                    this.markers.push(m)
+                });
+                
+                return true
+            })
         },
         getLocationsInRegion(region_id) {
             return Array.from(
@@ -215,12 +235,102 @@ export default {
             for (var i = 0; i < list.length; ++i) {
                 list[i].classList.remove('highlighted');
             }
+        },
+        onRegionClick(region) {
+            if ( this.selectedRegionSlug ) {
+                return false;
+            }
+
+            if ( this.$route.path !== '/region/' + region.slug ) {
+                history.pushState({}, null, '/region/' + region.slug)
+            }
+
+            this.selectedRegionSlug = region.slug;
+            this.map.easeTo({
+                center: this.zoom_to_coordinate_mappings[region.slug],
+                zoom: 9,
+                duration: 1000,
+            });
+
+            this.setTabContent([{
+                title: 'Conversations With',
+                content: '<p>Video with content supporting the selected Visit and Explore sites.  Topics cover geology, climate, vegetation, biology, ecology/conservation, archaeology/history, and Native Americans.</p>'
+            },{
+                title: 'Further Your Exploration',
+                content: '<p>Links to other sites of interest in the region especially hiking trails, archaeological sites, and natural history related education centers.</p>'
+            },{
+                title: 'Community Content',
+                content: '<p>Coming soon.</p>'
+            }])
+
+            const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
+
+            this.$refs.region_info.openFlyout(region, locationsInRegion)
+
+            locationsInRegion.forEach((loc) => {
+                const circle = document.createElement("div");
+                circle.className = "circle";
+
+                const inner_circle = document.createElement("div");
+                inner_circle.className = "inner_circle";
+                
+                circle.appendChild(inner_circle);
+
+                // Marker container.
+                const el = document.createElement("div");
+                el.appendChild(circle);
+                el.className = "marker";
+                el.style.width = "30px";
+                el.style.height = "30px";
+                el.dataset.locationid = loc.id
+
+                el.addEventListener('mouseenter', () => {
+                    el.classList.add('highlighted')
+                    this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
+                })
+
+                el.addEventListener('mouseleave', () => {
+                    el.classList.remove('highlighted')
+                    this.$refs.region_info.setHighlight(-1)
+                })
+
+                const pop = new mapboxgl.Popup({
+                    offset: [-5, -15]
+                }).setText(loc.title.rendered)
+
+                new mapboxgl.Marker(el)
+                    .setLngLat([loc.longitude, loc.latitude])
+                    .setPopup(pop)
+                    .addTo(this.map);
+            });
+            
+            return true
+        },
+
+        restoreMapIntroduction() {
+            console.log('backbutton')
+            this.selectedRegionSlug = ""
+            this.markers.forEach((m) => {
+                m.remove()
+            })
+            this.markers = []
+            this.map.easeTo({
+                center: [-72.7457, 41.6215],
+                zoom: 8,
+                duration: 1000,
+            });
+            this.$refs.region_info.closeFlyout()
+            this.$emit('mapRestoreIntroductoryContent')
         }
     },
     mounted() {
         this.fetchMinimumData();
         this.initializeMap();
+        window.addEventListener('popstate', this.restoreMapIntroduction)
     },
+    beforeDestroy() {
+        window.removeEventListener('popstate', this.restoreMapIntroduction)
+    }
 };
 </script>
 
