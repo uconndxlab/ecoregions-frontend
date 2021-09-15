@@ -105,6 +105,7 @@ export default {
     background: rgba(37, 59, 80, 0.9);
     height: 100%;
     max-width: 600px;
+    width: 100%;
     display: block;
     position: absolute;
     left: 0;

@@ -5,6 +5,7 @@
             centered
             class="content-tabs-tabselect mb-10"
             background-color="transparent"
+            @change="onTabChange"
         >
             <v-tabs-slider color="transparent"></v-tabs-slider>
 
@@ -50,8 +51,9 @@ export default {
     },
     data: () => {
         return {
-            current_tab: null,
-            show_locations: true
+            current_tab: 0,
+            show_locations: true,
+            current_content_tabs_length: 0
         }
     },
     computed: {
@@ -65,15 +67,26 @@ export default {
         }),
         fetchContentBySlugs(slug_array) {
             this.fetchContentForTabs(slug_array)
+            this.current_tab = null
         },
         enableLocationList() {
             this.show_locations = true
         },
         disableLocationList() {
             this.show_locations = false
+        },
+        // This hack is purely to get around the 'automatic scroll to tab' functionality that vuetify has when you dynamically change tabs
+        onTabChange() {
+            if ( this.current_content_tabs_length !== this.content_tabs.length ) {
+                this.$nextTick(() => {
+                    this.current_tab = 0
+                    this.current_content_tabs_length = this.content_tabs.length
+                })
+            }
         }
     },
     created() {
+        this.current_content_tabs_length = this.content_tabs.length
         if ( this.requests ) {
             console.log(this.requests)
             this.fetchContentForTabs(this.requests)
