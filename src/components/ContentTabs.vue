@@ -29,7 +29,65 @@
                 <v-col>
                     <v-tabs-items v-model="current_tab">
                         <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
-                            <div v-html="ct.content" class="tab-content"></div>
+                            <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
+
+                            <div v-if="!contentIsGeneral && ct.title === 'Conversations With'">
+                                <h2 class="mb-6">Conversations</h2>
+                                <v-row
+                                    v-for="conv in content_location.conversations"
+                                    :key="`conv-${conv.id}`"
+                                >
+                                    <v-col md="6">
+                                        <p>{{ conv.speaker }}</p>
+                                        <h3>{{ conv.post_title }}</h3>
+                                        <p>{{ conv.post_content }}</p>
+                                    </v-col>
+                                    <v-col md="6">
+                                        <iframe
+                                            v-if="conv.video_link"
+                                            width="560"
+                                            height="315"
+                                            :src="youtubeEmbedLink(conv.video_link)"
+                                            frameborder="0"
+                                            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen
+                                        ></iframe>
+                                    </v-col>
+                                </v-row>
+
+                                <v-row v-if="!content_location.conversations">
+                                    <v-col>
+                                        <p>No conversations for this location yet.  Stay tuned!</p>
+                                    </v-col>
+                                </v-row>
+                            </div>
+
+                            <div v-if="!contentIsGeneral && ct.title === 'Further Your Exploration'">
+                                <h2 class="mb-6">Exploration</h2>
+
+                                <v-row
+                                    v-for="expl in content_location.explorations"
+                                    :key="`expl-${expl.id}`"
+                                >
+                                    <v-col md="4">
+                                        <h3>{{ expl.post_title }}</h3>
+                                    </v-col>
+                                    <v-col md="8">
+                                        <p>{{ expl.post_content }}</p>
+                                    </v-col>
+                                </v-row>
+
+                                <v-row v-if="!content_location.explorations">
+                                    <v-col>
+                                        <p>No explorations for this location yet.  Stay tuned!</p>
+                                    </v-col>
+                                </v-row>
+                            </div>
+
+                            <div v-if="!contentIsGeneral && ct.title === 'Community Content'">
+                                <h2 class="mb-6">Community Content</h2>
+                                <p>Coming soon.</p>
+                            </div>
                         </v-tab-item>
                     </v-tabs-items>
                 </v-col>
@@ -58,8 +116,15 @@ export default {
     },
     computed: {
         ...mapGetters({
-            content_tabs: 'getContentTabs'
-        })
+            content_tabs: 'getContentTabs',
+            content_location: 'getContentLocation'
+        }),
+        contentIsGeneral() {
+            if ( this.content_location && Object.keys(this.content_location).length === 0 ) {
+                return true
+            }
+            return false
+        }
     },
     methods: {
         ...mapActions({
@@ -83,6 +148,19 @@ export default {
                     this.current_content_tabs_length = this.content_tabs.length
                 })
             }
+        },
+        youtubeEmbedLink( link ) {
+            const youtubeEmbedTemplate = 'https://www.youtube.com/embed/'
+            const url = link.split(/(vi\/|v%3D|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+            const YId = undefined !== url[2] ? url[2].split(/[^0-9a-z_/\\-]/i)[0] : url[0]
+            if (YId === url[0]) {
+                // Not YT video
+            } else {
+                // Is YT video
+                const fullEmbedUrl = youtubeEmbedTemplate.concat(YId)
+                return fullEmbedUrl
+            }
+            return ''
         }
     },
     created() {

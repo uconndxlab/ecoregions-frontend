@@ -55,14 +55,12 @@ export default {
             fetchLocations: "fetchLocations",
         }),
         ...mapMutations({
-            setTabContent: "SET_CONTENT_TABS"
+            setTabContent: "SET_CONTENT_LOCATION"
         }),
         fetchMinimumData() {
             if (Array.isArray(this.regions) && !this.regions.length) {
                 this.fetchRegions()
-                    .then((resp) => {
-                        console.log(resp);
-                    })
+                    .then(() => {})
                     .catch((err) => {
                         console.log(err);
                     });
@@ -70,9 +68,7 @@ export default {
 
             if (Array.isArray(this.locations) && !this.locations.length) {
                 this.fetchLocations()
-                    .then((resp) => {
-                        console.log(resp);
-                    })
+                    .then(() => {})
                     .catch((err) => {
                         console.log(err);
                     });
@@ -160,18 +156,9 @@ export default {
                     duration: 1000,
                 });
 
-                this.setTabContent([{
-                    title: 'Conversations With',
-                    content: '<p>Video with content supporting the selected Visit and Explore sites.  Topics cover geology, climate, vegetation, biology, ecology/conservation, archaeology/history, and Native Americans.</p>'
-                },{
-                    title: 'Further Your Exploration',
-                    content: '<p>Links to other sites of interest in the region especially hiking trails, archaeological sites, and natural history related education centers.</p>'
-                },{
-                    title: 'Community Content',
-                    content: '<p>Coming soon.</p>'
-                }])
-
                 const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
+
+                this.setTabContent(locationsInRegion[0])
 
                 this.$refs.region_info.openFlyout(region, locationsInRegion)
 
@@ -252,18 +239,9 @@ export default {
                 duration: 1000,
             });
 
-            this.setTabContent([{
-                title: 'Conversations With',
-                content: '<p>Video with content supporting the selected Visit and Explore sites.  Topics cover geology, climate, vegetation, biology, ecology/conservation, archaeology/history, and Native Americans.</p>'
-            },{
-                title: 'Further Your Exploration',
-                content: '<p>Links to other sites of interest in the region especially hiking trails, archaeological sites, and natural history related education centers.</p>'
-            },{
-                title: 'Community Content',
-                content: '<p>Coming soon.</p>'
-            }])
-
             const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
+
+            this.setTabContent(locationsInRegion[0])
 
             this.$refs.region_info.openFlyout(region, locationsInRegion)
 
@@ -308,7 +286,6 @@ export default {
         },
 
         restoreMapIntroduction() {
-            console.log('backbutton')
             this.selectedRegionSlug = ""
             this.markers.forEach((m) => {
                 m.remove()

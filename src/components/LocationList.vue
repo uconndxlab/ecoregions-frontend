@@ -5,16 +5,17 @@
             v-model="selected"
             filled
             item-text="title.rendered"
-            item-value="title.rendered"
+            item-value="slug"
             max-width="600"
             placeholder="Select a Location"
             class="component-location-list-select"
+            @change="onInputChange"
         ></v-select>
     </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
     data: () => {
@@ -26,18 +27,23 @@ export default {
     },
     computed: {
         ...mapGetters({
-            allLocations: 'getLocations'
+            allLocations: 'getLocations',
+            contentTabs: 'getContentTabs'
         })
     },
     methods: {
         ...mapActions({
             fetchLocations: 'fetchLocations'
         }),
+        ...mapMutations({
+            setContentTabs: 'SET_CONTENT_LOCATION'
+        }),
         fetchMinimumData() {
             if ( Array.isArray(this.locations) && !this.locations.length ) {
                 this.fetchLocations().then(() => {
                     this.locations = this.allLocations
                     this.selected = this.locations[0]
+                    this.setContentTabs(this.locations[0])
                 }).catch((err) => {
                     console.log(err)
                 })
@@ -48,7 +54,12 @@ export default {
                 this.locations = this.$store.getters.getLocationsForRegion(region_id)
                 this.region = region_id
                 this.selected = this.locations[0]
+                this.setContentTabs(this.locations[0])
             }
+        },
+        onInputChange(slug) {
+            const l = this.locations.find(e => slug === e.slug)
+            this.setContentTabs(l)
         }
     },
     mounted() {
