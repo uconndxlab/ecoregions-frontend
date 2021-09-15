@@ -20,7 +20,7 @@
         </v-tabs>
 
         <v-container>
-            <v-row align="center" justify="center" v-if="show_locations">
+            <v-row align="center" justify="center" v-if="!contentIsGeneral">
                 <v-col md="6">
                     <location-list></location-list>
                 </v-col>
