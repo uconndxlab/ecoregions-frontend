@@ -31,16 +31,15 @@
                         <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
                             <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
 
-                            <div v-if="!contentIsGeneral && ct.title === 'Conversations With'">
-                                <h2 class="mb-6">Conversations</h2>
+                            <div v-if="!contentIsGeneral && ct.title === 'Conversations With'" class="tab-content">
                                 <v-row
                                     v-for="conv in content_location.conversations"
                                     :key="`conv-${conv.id}`"
                                 >
                                     <v-col md="6">
-                                        <p>{{ conv.speaker }}</p>
+                                        <p class="speaker-byline">{{ conv.speaker }}</p>
                                         <h3>{{ conv.post_title }}</h3>
-                                        <p>{{ conv.post_content }}</p>
+                                        <p class="limited-height">{{ conv.post_content }}</p>
                                     </v-col>
                                     <v-col md="6">
                                         <iframe
@@ -62,9 +61,7 @@
                                 </v-row>
                             </div>
 
-                            <div v-if="!contentIsGeneral && ct.title === 'Further Your Exploration'">
-                                <h2 class="mb-6">Exploration</h2>
-
+                            <div v-if="!contentIsGeneral && ct.title === 'Further Your Exploration'" class="tab-content">
                                 <v-row
                                     v-for="expl in content_location.explorations"
                                     :key="`expl-${expl.id}`"
@@ -84,8 +81,7 @@
                                 </v-row>
                             </div>
 
-                            <div v-if="!contentIsGeneral && ct.title === 'Community Content'">
-                                <h2 class="mb-6">Community Content</h2>
+                            <div v-if="!contentIsGeneral && ct.title === 'Community Content'" class="tab-content">
                                 <p>Coming soon.</p>
                             </div>
                         </v-tab-item>
@@ -205,5 +201,31 @@ export default {
     background-color: white;
     padding: 16px 30px;
     border-radius: 6px;
+}
+
+.tab-content h3 {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 28px;
+    margin-bottom: 40px;
+}
+
+.tab-content p {
+    font-size: 16px;
+    line-height: 32px;
+}
+
+.tab-content p.limited-height {
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.tab-content p.speaker-byline {
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 600;
+    margin-bottom: 20px;
 }
 </style>
