@@ -39,7 +39,7 @@
                                     <v-col md="6">
                                         <p class="speaker-byline">{{ conv.speaker }}</p>
                                         <h3>{{ conv.post_title }}</h3>
-                                        <p class="limited-height">{{ conv.post_content }}</p>
+                                        <div class="limited-height" v-html="$options.filters.cleanContent(conv.post_content)"></div>
                                     </v-col>
                                     <v-col md="6">
                                         <iframe
@@ -70,7 +70,7 @@
                                         <h3>{{ expl.post_title }}</h3>
                                     </v-col>
                                     <v-col md="8">
-                                        <p>{{ expl.post_content }}</p>
+                                        <div v-html="$options.filters.cleanContent(expl.post_content)"></div>
                                     </v-col>
                                 </v-row>
 
@@ -216,7 +216,7 @@ export default {
     line-height: 32px;
 }
 
-.tab-content p.limited-height {
+.tab-content div.limited-height {
     max-height: 300px;
     overflow-y: scroll;
 }
