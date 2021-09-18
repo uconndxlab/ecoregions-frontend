@@ -16,6 +16,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import locationEventBus from '@/events/locationEventBus'
 
 export default {
     data: () => {
@@ -64,6 +65,12 @@ export default {
     },
     mounted() {
         this.fetchMinimumData()
+        locationEventBus.$on('location-selected', (loc) => {
+            this.selected = loc.slug
+        })
+    },
+    beforeDestroy() {
+        locationEventBus.$off('location-selected')
     }
 }
 </script>

@@ -3,7 +3,7 @@
         <div class="flyout-content">
             <v-btn
                 text
-                @click="step = step - 1"
+                @click="goBack()"
                 :disabled="step < 2"
                 color="white"
                 class="mb-3"
@@ -11,8 +11,8 @@
                 <v-icon left dark> mdi-chevron-left </v-icon>
                 Back
             </v-btn>
-            <h1 v-if="region.name" class="mb-3 text-h4">{{ region.name }}</h1>
-            <p v-if="region.flavor_text" class="mb-8">{{ region.flavor_text }}</p>
+            <h1 v-if="region.name && step < 3" class="mb-3 text-h4">{{ region.name }}</h1>
+            <p v-if="region.flavor_text && step < 3" class="mb-8">{{ region.flavor_text }}</p>
 
             <div class="step-overview step" v-if="step == 1">
                 <h6 class="text-h6 mb-6">Overview</h6>
@@ -27,7 +27,7 @@
                 <v-list-item-group v-model="highlightedLocationIndex">
                     <template v-for="loc in locations">
                     <v-list-item two-line :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)"
-                    @click="setContentTabsForLocation(loc)">
+                    @click="setLocation(loc)">
                         <v-list-item-content>
                             <v-list-item-title class="location-list-item-title text-h5 mb-4 mt-3">{{
                                 loc.title.rendered
@@ -41,12 +41,24 @@
                     </template>
                 </v-list-item-group>
             </div>
+
+            <div class="step-location-description step" v-if="step == 3 && content_location">
+                <h1 class="mb-3 text-h4">{{ content_location.title.rendered }}</h1>
+                <p v-if="content_location.flavor_text" class="mb-8 flavor">{{ content_location.flavor_text }}</p>
+                <div class="overview text-body-1" v-if="content_location.content.rendered">
+                    <div v-html="content_location.content.rendered"></div>
+                </div>
+                <div class="text-body-1" v-else>
+                    <p>See below for more on this location!</p>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import locationEventBus from '@/events/locationEventBus'
 
 export default {
     data: () => {
@@ -58,10 +70,13 @@ export default {
             },
             locations: [],
             step: 0,
-            highlightedLocationIndex: -1
+            highlightedLocationIndex: -1,
         };
     },
     computed: {
+        ...mapGetters({
+            content_location: 'getContentLocation'
+        }),
         objclass() {
             if (this.open) {
                 return "region-info-flyout";
@@ -71,7 +86,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            setTabContent: 'SET_CONTENT_TABS'
+            setContentLocation: 'SET_CONTENT_LOCATION'
         }),
         openFlyout(region, locations) {
             this.region = region;
@@ -93,6 +108,17 @@ export default {
         },
         emitListDeHighlightEvent(location) {
             this.$emit('locationListDeHighlight', location);
+        },
+        setLocation(location) {
+            this.setContentLocation(location)
+            this.step = 3
+            locationEventBus.$emit('location-selected', location)
+        },
+        goBack() {
+            if ( this.step > 1 ) {
+                this.step = this.step - 1
+                this.selectedLocation = null
+            }
         }
     },
 };
@@ -143,5 +169,12 @@ export default {
 .location-list-item-title, .location-list-item-flavor {
     text-overflow: normal;
     white-space: normal;
+}
+
+.flavor {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    font-family: 'Raleway', sans-serif;
 }
 </style>
