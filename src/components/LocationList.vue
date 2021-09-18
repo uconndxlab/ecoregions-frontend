@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import locationEventBus from '@/events/locationEventBus'
 
 export default {
@@ -33,23 +33,9 @@ export default {
         })
     },
     methods: {
-        ...mapActions({
-            fetchLocations: 'fetchLocations'
-        }),
         ...mapMutations({
             setContentTabs: 'SET_CONTENT_LOCATION'
         }),
-        fetchMinimumData() {
-            if ( Array.isArray(this.locations) && !this.locations.length ) {
-                this.fetchLocations().then(() => {
-                    this.locations = this.allLocations
-                    this.selected = this.locations[0]
-                    this.setContentTabs(this.locations[0])
-                }).catch((err) => {
-                    console.log(err)
-                })
-            }
-        },
         updateWithRegion(region_id = 0) {
             if ( region_id > 0 ) {
                 this.locations = this.$store.getters.getLocationsForRegion(region_id)
@@ -69,13 +55,16 @@ export default {
         }
     },
     mounted() {
-        this.fetchMinimumData()
         locationEventBus.$on('location-selected', (loc) => {
             this.selected = loc.slug
+        })
+        locationEventBus.$on('region-selected', (reg) => {
+            this.updateWithRegion(reg.id)
         })
     },
     beforeDestroy() {
         locationEventBus.$off('location-selected')
+        locationEventBus.$off('region-selected')
     }
 }
 </script>

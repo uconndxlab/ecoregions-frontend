@@ -10,6 +10,7 @@
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import mapboxgl from "mapbox-gl";
 import RegionInfo from '@/components/RegionInfo.vue'
+import locationEventBus from '@/events/locationEventBus'
 
 export default {
     props: {
@@ -164,7 +165,7 @@ export default {
                 const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
 
                 this.setTabContent(locationsInRegion[0])
-
+                locationEventBus.$emit('region-selected', region)
                 this.$refs.region_info.openFlyout(region, locationsInRegion)
 
                 locationsInRegion.forEach((loc) => {
@@ -291,6 +292,7 @@ export default {
 
             if ( !this.startLocation && !startLocObj ) {
                 this.setTabContent(locationsInRegion[0])
+                locationEventBus.$emit('region-selected', region)
                 this.$refs.region_info.openFlyout(region, locationsInRegion)
             } else {
                 this.$refs.region_info.openFlyoutWithLocation(region, locationsInRegion, startLocObj)
