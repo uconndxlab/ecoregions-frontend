@@ -1,7 +1,7 @@
 <template>
     <div class="component-map">
         <v-alert class="info-alert" v-if="selectedRegionSlug === ''">Select a region to begin.</v-alert>
-        <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent"></region-info>
+        <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
         <div id="main-mapbox"></div>
     </div>
 </template>
@@ -145,7 +145,7 @@ export default {
                     return false;
                 }
 
-                if ( this.$route.path !== '/region/' + region.slug ) {
+                if ( window.location.pathname !== '/region/' + region.slug ) {
                     history.pushState({}, null, '/region/' + region.slug)
                 }
 
@@ -228,7 +228,7 @@ export default {
                 return false;
             }
 
-            if ( this.$route.path !== '/region/' + region.slug ) {
+            if ( window.location.pathname !== '/region/' + region.slug ) {
                 history.pushState({}, null, '/region/' + region.slug)
             }
 
@@ -297,6 +297,10 @@ export default {
                 duration: 1000,
             });
             this.$refs.region_info.closeFlyout()
+            console.log(window.location.href)
+            if ( window.location.pathname !== '/' ) {
+                history.pushState({}, null, '/')
+            }
             this.$emit('mapRestoreIntroductoryContent')
         }
     },

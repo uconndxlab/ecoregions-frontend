@@ -13,10 +13,10 @@
             </v-btn>
 
             <div class="d-flex justify-space-around progress-points mb-3">
-                <a>CT Map</a>
-                <a :class="step < 1 ? 'disabled' : ''">Overview</a>
-                <a :class="step < 2 ? 'disabled' : ''">Explore &amp; Visit</a>
-                <a :class="step < 3 ? 'disabled' : ''">Place</a>
+                <a @click.prevent="navigateToStep(0)">CT Map</a>
+                <a @click.prevent="navigateToStep(1)" :class="step < 1 ? 'disabled' : ''">Overview</a>
+                <a @click.prevent="navigateToStep(2)" :class="step < 2 ? 'disabled' : ''">Explore &amp; Visit</a>
+                <a @click.prevent="navigateToStep(3)" :class="step < 3 ? 'disabled' : ''">Place</a>
             </div>
 
             <v-progress-linear
@@ -131,6 +131,9 @@ export default {
         emitListDeHighlightEvent(location) {
             this.$emit('locationListDeHighlight', location);
         },
+        emitHomeMapStateEvent() {
+            this.$emit('homeMapStateRequested')
+        },
         setLocation(location) {
             this.setContentLocation(location)
             this.step = 3
@@ -140,6 +143,15 @@ export default {
             if ( this.step > 1 ) {
                 this.step = this.step - 1
                 this.selectedLocation = null
+            }
+        },
+        navigateToStep(step) {
+            if ( step < this.step ) {
+                this.selectedLocation = null
+                this.step = step
+                if ( step === 0 ) {
+                    this.emitHomeMapStateEvent()
+                }
             }
         }
     },
@@ -170,7 +182,7 @@ export default {
     overflow-y: scroll;
     padding: 8px 8px 8px 0;
     flex-grow: 1;
-    max-height: 60%;
+    max-height: 53%;
 }
 
 .region-info-flyout .step {
@@ -210,5 +222,6 @@ export default {
 
 .progress-points a.disabled {
     color: rgba(255, 255, 255, 0.54);
+    cursor: default;
 }
 </style>
