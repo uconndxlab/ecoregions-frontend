@@ -162,17 +162,10 @@ export default {
             }
         },
         goBackFromPopstate() {
-            console.log(window.location.pathname)
             if ( window.location.pathname.includes('/region/') ) {
                 // navigating to region, just go back.
                 this.goBack()
             }
-        },
-        mounted() {
-            window.addEventListener('popstate', this.goBackFromPopstate)
-        },
-        beforeDestroy() {
-            window.addEventListener('popstate', this.goBackFromPopstate)
         }
     },
 };
