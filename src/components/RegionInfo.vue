@@ -156,8 +156,14 @@ export default {
         navigateToStep(step) {
             if ( step < this.step ) {
                 this.step = step
+                if ( step === 1 ) {
+                    history.pushState({}, null, '/region/' + this.region.slug)
+                }
+
                 if ( step === 0 ) {
+                    history.pushState({}, null, '/')
                     this.emitHomeMapStateEvent()
+                    
                 }
             }
         },
