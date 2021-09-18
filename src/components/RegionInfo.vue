@@ -6,12 +6,27 @@
                 @click="goBack()"
                 :disabled="step < 2"
                 color="white"
-                class="mb-3"
+                class="mb-6"
             >
                 <v-icon left dark> mdi-chevron-left </v-icon>
                 Back
             </v-btn>
-            <h1 v-if="region.name && step < 3" class="mb-3 text-h4">{{ region.name }}</h1>
+
+            <div class="d-flex justify-space-around progress-points mb-3">
+                <a>CT Map</a>
+                <a :class="step < 1 ? 'disabled' : ''">Overview</a>
+                <a :class="step < 2 ? 'disabled' : ''">Explore &amp; Visit</a>
+                <a :class="step < 3 ? 'disabled' : ''">Place</a>
+            </div>
+
+            <v-progress-linear
+                color="primary"
+                height="19"
+                v-model="progressBar"
+                class="mb-7"
+            ></v-progress-linear>
+
+            <h1 v-if="region.name && step < 3" class="mb-4 text-h4">{{ region.name }}</h1>
             <p v-if="region.flavor_text && step < 3" class="mb-8">{{ region.flavor_text }}</p>
 
             <div class="step-overview step" v-if="step == 1">
@@ -43,7 +58,7 @@
             </div>
 
             <div class="step-location-description step" v-if="step == 3 && content_location">
-                <h1 class="mb-3 text-h4">{{ content_location.title.rendered }}</h1>
+                <h1 class="mb-4 text-h4">{{ content_location.title.rendered }}</h1>
                 <p v-if="content_location.flavor_text" class="mb-8 flavor">{{ content_location.flavor_text }}</p>
                 <div class="overview text-body-1" v-if="content_location.content.rendered">
                     <div v-html="content_location.content.rendered"></div>
@@ -83,6 +98,13 @@ export default {
             }
             return "region-info-flyout hidden";
         },
+        progressBar() {
+            // return (this.step + 1) * 25
+            if ( this.step > 2 ) {
+                return 100
+            }
+            return ((this.step + 1) * 25) - 15
+        }
     },
     methods: {
         ...mapMutations({
@@ -176,5 +198,17 @@ export default {
     font-size: 16px;
     line-height: 24px;
     font-family: 'Raleway', sans-serif;
+}
+
+.progress-points a {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 16px;
+    color: white;
+}
+
+.progress-points a.disabled {
+    color: rgba(255, 255, 255, 0.54);
 }
 </style>
