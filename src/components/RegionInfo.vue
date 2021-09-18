@@ -58,9 +58,9 @@
             </div>
 
             <div class="step-location-description step" v-if="step == 3 && content_location">
-                <h1 class="mb-4 text-h4">{{ content_location.title.rendered }}</h1>
+                <h1 class="mb-4 text-h4" v-if="content_location.title && content_location.title.rendered">{{ content_location.title.rendered }}</h1>
                 <p v-if="content_location.flavor_text" class="mb-8 flavor">{{ content_location.flavor_text }}</p>
-                <div class="overview text-body-1" v-if="content_location.content.rendered">
+                <div class="overview text-body-1" v-if="content_location.content && content_location.content.rendered">
                     <div v-html="content_location.content.rendered"></div>
                 </div>
                 <div class="text-body-1" v-else>
@@ -116,6 +116,12 @@ export default {
             this.step = 1;
             this.open = true;
         },
+        openFlyoutWithLocation(region, locations, location) {
+            this.region = region
+            this.locations = locations;
+            this.setLocation(location)
+            this.open = true;
+        },
         closeFlyout() {
             this.open = false;
         },
@@ -138,21 +144,35 @@ export default {
             this.setContentLocation(location)
             this.step = 3
             locationEventBus.$emit('location-selected', location)
+            if ( window.location.pathname !== '/location/' + location.slug ) {
+                history.pushState({}, null, '/location/' + location.slug)
+            }
         },
         goBack() {
             if ( this.step > 1 ) {
                 this.step = this.step - 1
-                this.selectedLocation = null
             }
         },
         navigateToStep(step) {
             if ( step < this.step ) {
-                this.selectedLocation = null
                 this.step = step
                 if ( step === 0 ) {
                     this.emitHomeMapStateEvent()
                 }
             }
+        },
+        goBackFromPopstate() {
+            console.log(window.location.pathname)
+            if ( window.location.pathname.includes('/region/') ) {
+                // navigating to region, just go back.
+                this.goBack()
+            }
+        },
+        mounted() {
+            window.addEventListener('popstate', this.goBackFromPopstate)
+        },
+        beforeDestroy() {
+            window.addEventListener('popstate', this.goBackFromPopstate)
         }
     },
 };

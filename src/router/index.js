@@ -13,7 +13,12 @@ const routes = [
   {
     path: '/region/:region',
     name: 'Region',
-    component: () => import(/* webpackChunkName: "region" */ '../views/Region.vue')
+    component: () => import(/* webpackChunkName: "region" */ '../views/Home.vue')
+  },
+  {
+    path: '/location/:location',
+    name: 'Location',
+    component: () => import(/* webpackChunkName: "location" */ '../views/Home.vue')
   }
 ]
 

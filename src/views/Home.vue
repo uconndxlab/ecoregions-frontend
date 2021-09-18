@@ -1,6 +1,6 @@
 <template>
   <div class="page-home">
-    <region-map @mapRestoreIntroductoryContent="restoreIntroContent()"></region-map>
+    <region-map :start-region="$route.params.region" :start-location="$route.params.location" @mapRestoreIntroductoryContent="restoreIntroContent()"></region-map>
     <content-tabs :requests="content_tab_page_slugs" ref="cont_tabs"></content-tabs>
   </div>
 </template>
@@ -16,7 +16,7 @@ export default {
   },
   data: () => {
     return {
-      content_tab_page_slugs: ['introduction', 'about']
+      content_tab_page_slugs: ['introduction']
     }
   },
   methods: {

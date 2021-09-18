@@ -60,7 +60,12 @@ export default {
         },
         onInputChange(slug) {
             const l = this.locations.find(e => slug === e.slug)
-            this.setContentTabs(l)
+            if ( l ) {
+                this.setContentTabs(l)
+                if ( window.location.pathname !== '/location/' + l.slug ) {
+                    history.pushState({}, null, '/location/' + l.slug)
+                }
+            }
         }
     },
     mounted() {

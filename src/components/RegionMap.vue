@@ -13,7 +13,8 @@ import RegionInfo from '@/components/RegionInfo.vue'
 
 export default {
     props: {
-        start: String
+        startRegion: String,
+        startLocation: String
     },
     components: {
         RegionInfo
@@ -90,7 +91,7 @@ export default {
                     this.regions.forEach((region) => {
                         const coords =
                             this.region_coordinate_mappings[region.slug];
-                        if ( this.start && region.slug === this.start ) {
+                        if ( this.startRegion && region.slug === this.startRegion ) {
                             start_region_obj = region
                         }
                         if (coords) {
@@ -100,6 +101,10 @@ export default {
 
                     if ( start_region_obj && start_region_obj.slug ) {
                         this.onRegionClick(start_region_obj)
+                    }
+
+                    if ( this.startLocation ) {
+                        this.onInitializedWithLocation()
                     }
                 }
             });
@@ -228,7 +233,9 @@ export default {
                 return false;
             }
 
-            if ( window.location.pathname !== '/region/' + region.slug ) {
+            let startLocObj = null
+
+            if ( window.location.pathname !== '/region/' + region.slug && !this.startLocation ) {
                 history.pushState({}, null, '/region/' + region.slug)
             }
 
@@ -240,10 +247,6 @@ export default {
             });
 
             const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
-
-            this.setTabContent(locationsInRegion[0])
-
-            this.$refs.region_info.openFlyout(region, locationsInRegion)
 
             locationsInRegion.forEach((loc) => {
                 const circle = document.createElement("div");
@@ -280,28 +283,54 @@ export default {
                     .setLngLat([loc.longitude, loc.latitude])
                     .setPopup(pop)
                     .addTo(this.map);
+
+                if ( loc.slug == this.startLocation ) {
+                    startLocObj = loc
+                }
             });
+
+            if ( !this.startLocation && !startLocObj ) {
+                this.setTabContent(locationsInRegion[0])
+                this.$refs.region_info.openFlyout(region, locationsInRegion)
+            } else {
+                this.$refs.region_info.openFlyoutWithLocation(region, locationsInRegion, startLocObj)
+            }
             
             return true
         },
 
-        restoreMapIntroduction() {
-            this.selectedRegionSlug = ""
-            this.markers.forEach((m) => {
-                m.remove()
-            })
-            this.markers = []
-            this.map.easeTo({
-                center: [-72.7457, 41.6215],
-                zoom: 8,
-                duration: 1000,
-            });
-            this.$refs.region_info.closeFlyout()
-            console.log(window.location.href)
-            if ( window.location.pathname !== '/' ) {
-                history.pushState({}, null, '/')
+        onInitializedWithLocation() {
+            if ( this.startLocation ) {
+                const location = this.locations.find( x => x.slug == this.startLocation )
+                if ( location && Array.isArray(location.region) && location.region.length > 0 ) {
+                    const region = this.regions.find( x => x.id == location.region[0] )
+                    if ( region ) {
+                        this.onRegionClick(region)
+                    }
+                }
             }
-            this.$emit('mapRestoreIntroductoryContent')
+        },
+
+        restoreMapIntroduction() {
+            if ( window.location.pathname === '/' ) {
+                this.selectedRegionSlug = ""
+                this.markers.forEach((m) => {
+                    m.remove()
+                })
+                this.markers = []
+                this.map.easeTo({
+                    center: [-72.7457, 41.6215],
+                    zoom: 8,
+                    duration: 1000,
+                });
+                this.$refs.region_info.closeFlyout()
+                this.$emit('mapRestoreIntroductoryContent')
+            }
+            
+            if ( window.location.pathname.includes('/region/') ) {
+                this.$refs.region_info.goBackFromPopstate()
+            }
+            
         }
     },
     mounted() {

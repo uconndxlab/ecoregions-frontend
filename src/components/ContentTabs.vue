@@ -162,7 +162,6 @@ export default {
     created() {
         this.current_content_tabs_length = this.content_tabs.length
         if ( this.requests ) {
-            console.log(this.requests)
             this.fetchContentForTabs(this.requests)
         }
     }
