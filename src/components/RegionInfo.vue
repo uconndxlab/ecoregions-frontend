@@ -181,7 +181,7 @@ export default {
 .region-info-flyout {
     background: rgba(37, 59, 80, 0.9);
     height: 100%;
-    max-width: 600px;
+    max-width: 650px;
     width: 100%;
     display: block;
     position: absolute;
@@ -190,7 +190,7 @@ export default {
     bottom: 0;
     z-index: 999;
     color: white;
-    padding: 20px 50px 150px;
+    padding: 20px 50px 80px;
 }
 
 .hidden {
@@ -201,12 +201,17 @@ export default {
     overflow-y: scroll;
     padding: 8px 8px 8px 0;
     flex-grow: 1;
-    max-height: 53%;
+    max-height: 51%;
 }
 
 .region-info-flyout .step {
     position: relative;
     height: 100%;
+}
+
+.region-info-flyout .step-overview {
+    height: 90%;
+    max-height: 90%;
 }
 
 .flyout-content {
@@ -242,5 +247,13 @@ export default {
 .progress-points a.disabled {
     color: rgba(255, 255, 255, 0.54);
     cursor: default;
+}
+</style>
+
+<style lang="scss" scoped>
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
+    .region-info-flyout {
+        max-width: 100%;
+    }
 }
 </style>
