@@ -188,7 +188,7 @@ export default {
 }
 
 .tab-content {
-    padding: 50px;
+    padding: 50px 0;
 }
 </style>
 

@@ -2,17 +2,20 @@
   <div class="page-home">
     <region-map :start-region="$route.params.region" :start-location="$route.params.location" @mapRestoreIntroductoryContent="restoreIntroContent()"></region-map>
     <content-tabs :requests="content_tab_page_slugs" ref="cont_tabs"></content-tabs>
+    <ecoregions-footer></ecoregions-footer>
   </div>
 </template>
 
 <script>
 import RegionMap from '@/components/RegionMap.vue'
 import ContentTabs from '@/components/ContentTabs.vue'
+import EcoregionsFooter from '@/components/Footer.vue'
 
 export default {
   components: {
     RegionMap,
-    ContentTabs
+    ContentTabs,
+    EcoregionsFooter
   },
   data: () => {
     return {
