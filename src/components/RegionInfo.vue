@@ -150,7 +150,7 @@ export default {
         },
         goBack() {
             if ( this.step > 1 ) {
-                this.step = this.step - 1
+                this.navigateToStep(this.step - 1)
             }
         },
         navigateToStep(step) {
@@ -251,7 +251,7 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
+@media #{map-get($display-breakpoints, 'md-and-down')} {
     .region-info-flyout {
         max-width: 100%;
     }
