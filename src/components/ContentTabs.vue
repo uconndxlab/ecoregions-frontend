@@ -4,7 +4,7 @@
             v-model="current_tab"
             centered
             :show-arrows="'mobile'"
-            class="content-tabs-tabselect mb-10"
+            class="content-tabs-tabselect mb-md-10"
             background-color="transparent"
             @change="onTabChange"
         >
@@ -20,8 +20,8 @@
             
         </v-tabs>
 
-        <v-container>
-            <v-row align="center" justify="center" v-show="!contentIsGeneral">
+        <v-container class="tab-content-container">
+            <v-row align="center" justify="center" v-show="!contentIsGeneral" >
                 <v-col md="6">
                     <location-list></location-list>
                 </v-col>
@@ -191,6 +191,11 @@ export default {
 .tab-content {
     padding: 50px 0;
 }
+
+.tab-content-container {
+    padding-left: 20px;
+    padding-right: 20px;
+}
 </style>
 
 <style>
@@ -240,6 +245,10 @@ export default {
         font-size: 16px;
         padding-left: 20px;
         padding-right: 20px;
+    }
+
+    .tab-content {
+        padding-top: 10px;
     }
 }
 </style>

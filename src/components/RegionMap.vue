@@ -442,3 +442,12 @@ export default {
     padding-right: 35px;
 }
 </style>
+
+<style lang="scss" scoped>
+@media #{map-get($display-breakpoints, 'md-and-down')} {
+    #main-mapbox {
+        min-height: 95vh;
+    }
+}
+
+</style>

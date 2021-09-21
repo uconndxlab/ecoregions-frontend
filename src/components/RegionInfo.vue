@@ -39,7 +39,7 @@
 
             <div class="step-locations step" v-if="step == 2">
                 <h6 class="text-h6 mb-6">Explore &amp; Visit</h6>
-                <v-list-item-group v-model="highlightedLocationIndex">
+                <v-list-item-group v-model="highlightedLocationIndex" class="overview">
                     <template v-for="loc in locations">
                     <v-list-item two-line :key="loc.id" class="location-list-item" dark @mouseenter="emitListHighlightEvent(loc)" @mouseleave="emitListDeHighlightEvent(loc)"
                     @click="setLocation(loc)">
@@ -204,11 +204,6 @@ export default {
     max-height: 51%;
 }
 
-.region-info-flyout .step {
-    position: relative;
-    height: 100%;
-}
-
 .region-info-flyout .step-overview {
     height: 90%;
     max-height: 90%;
@@ -254,6 +249,37 @@ export default {
 @media #{map-get($display-breakpoints, 'md-and-down')} {
     .region-info-flyout {
         max-width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 20px;
+
+        .flyout-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+
+            & > * {
+                flex: 0 0 auto;
+            }
+
+            .step {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+                max-height: none;
+                flex: 1 1 0%;
+                height: 1%;
+                
+                & > * {
+                    flex: 0 0 auto;
+                }
+
+                .overview {
+                    flex: 1 0 0%;
+                    max-height: none;
+                }
+            }
+        }
     }
 }
 </style>
