@@ -55,6 +55,22 @@ export default {
         },
         isXS() {
             return this.$vuetify.breakpoint.name === 'xs'
+        },
+        initialMapConfig() {
+            let map_config = {
+                container: "main-mapbox",
+                style: "mapbox://styles/mapbox/outdoors-v11",
+                center: [-72.7457, 41.6215],
+                zoom: 8,
+            }
+
+            // Slightly change the configuration for default display on a vertical mobile device.
+            if ( this.isSM || this.isXS ) {
+                map_config.zoom = 7
+                map_config.center = [-72.7457, 41.3]
+            }
+
+            return map_config
         }
     },
     methods: {
@@ -85,20 +101,8 @@ export default {
         initializeMap() {
             mapboxgl.accessToken =
                 "pk.eyJ1IjoidWNvbm5keGdyb3VwIiwiYSI6ImNrcTg4dWc5NzBkcWYyd283amtpNjFiZXkifQ.iGpZ5PfDWFWWPkuDeGQ3NQ";
-            let map_config = {
-                container: "main-mapbox",
-                style: "mapbox://styles/mapbox/outdoors-v11",
-                center: [-72.7457, 41.6215],
-                zoom: 8,
-            }
 
-            // Slightly change the configuration for default display on a vertical mobile device.
-            if ( this.isSM || this.isXS ) {
-                map_config.zoom = 7
-                map_config.center = [-72.7457, 41.3]
-            }
-
-            this.map = new mapboxgl.Map(map_config);
+            this.map = new mapboxgl.Map(this.initialMapConfig);
 
             this.map.on("load", () => {
                 let start_region_obj = {}
@@ -179,10 +183,7 @@ export default {
 
                 if ( this.isSM || this.isXS ) {
                     ease_to_config.zoom = 8,
-                    ease_to_config.center = [
-                        this.zoom_to_coordinate_mappings[region.slug][0],
-                        this.zoom_to_coordinate_mappings[region.slug][1] - 0.5
-                    ]
+                    ease_to_config.center = this.getMobileAdjustedCenterForRegion(region.slug)
                 }
 
                 this.map.easeTo(ease_to_config);
@@ -275,10 +276,7 @@ export default {
 
             if ( this.isSM || this.isXS ) {
                 ease_to_config.zoom = 8,
-                ease_to_config.center = [
-                    this.zoom_to_coordinate_mappings[region.slug][0] + 0.3,
-                    this.zoom_to_coordinate_mappings[region.slug][1] - 0.3
-                ]
+                ease_to_config.center = this.getMobileAdjustedCenterForRegion(region.slug)
             }
 
             this.map.easeTo(ease_to_config);
@@ -331,6 +329,7 @@ export default {
                 locationEventBus.$emit('region-selected', region)
                 this.$refs.region_info.openFlyout(region, locationsInRegion)
             } else {
+                locationEventBus.$emit('region-selected', region)
                 this.$refs.region_info.openFlyoutWithLocation(region, locationsInRegion, startLocObj)
             }
             
@@ -349,6 +348,13 @@ export default {
             }
         },
 
+        getMobileAdjustedCenterForRegion(region_slug) {
+            return [
+                this.zoom_to_coordinate_mappings[region_slug][0] + 0.4,
+                this.zoom_to_coordinate_mappings[region_slug][1] - 0.2,
+            ]
+        },
+
         restoreMapIntroduction() {
             if ( window.location.pathname === '/' ) {
                 this.selectedRegionSlug = ""
@@ -357,8 +363,8 @@ export default {
                 })
                 this.markers = []
                 this.map.easeTo({
-                    center: [-72.7457, 41.6215],
-                    zoom: 8,
+                    center: this.initialMapConfig.center,
+                    zoom: this.initialMapConfig.zoom,
                     duration: 1000,
                 });
                 this.$refs.region_info.closeFlyout()

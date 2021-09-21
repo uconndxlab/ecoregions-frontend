@@ -3,6 +3,7 @@
         <v-tabs
             v-model="current_tab"
             centered
+            :show-arrows="'mobile'"
             class="content-tabs-tabselect mb-10"
             background-color="transparent"
             @change="onTabChange"
@@ -226,5 +227,36 @@ export default {
     line-height: 19px;
     font-weight: 600;
     margin-bottom: 20px;
+}
+</style>
+
+<style lang="scss" scoped>
+@media #{map-get($display-breakpoints, 'md-and-down')} {
+    .content-tabs {
+        margin-top: 0;
+    }
+
+    .content-tabs-tab {
+        font-size: 16px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+</style>
+
+<style lang="scss">
+@media #{map-get($display-breakpoints, 'md-and-down')} {
+    .content-tabs-tabselect {
+        .v-slide-group__content {
+            padding-right: 10px;
+            padding-left: 10px;
+            // margin-left: 0;
+        }
+        .v-slide-group--is-overflowing {
+            .v-slide-group__content {
+                margin-left: 0;
+            }
+        }
+    } 
 }
 </style>
