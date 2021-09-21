@@ -50,6 +50,12 @@ export default {
             regions: "getRegions",
             locations: "getLocations"
         }),
+        isSM() {
+            return this.$vuetify.breakpoint.name === 'sm'
+        },
+        isXS() {
+            return this.$vuetify.breakpoint.name === 'xs'
+        }
     },
     methods: {
         ...mapActions({
@@ -79,12 +85,20 @@ export default {
         initializeMap() {
             mapboxgl.accessToken =
                 "pk.eyJ1IjoidWNvbm5keGdyb3VwIiwiYSI6ImNrcTg4dWc5NzBkcWYyd283amtpNjFiZXkifQ.iGpZ5PfDWFWWPkuDeGQ3NQ";
-            this.map = new mapboxgl.Map({
+            let map_config = {
                 container: "main-mapbox",
                 style: "mapbox://styles/mapbox/outdoors-v11",
                 center: [-72.7457, 41.6215],
                 zoom: 8,
-            });
+            }
+
+            // Slightly change the configuration for default display on a vertical mobile device.
+            if ( this.isSM || this.isXS ) {
+                map_config.zoom = 7
+                map_config.center = [-72.7457, 41.3]
+            }
+
+            this.map = new mapboxgl.Map(map_config);
 
             this.map.on("load", () => {
                 let start_region_obj = {}
@@ -156,11 +170,22 @@ export default {
                 }
 
                 this.selectedRegionSlug = region.slug;
-                this.map.easeTo({
+
+                let ease_to_config = {
                     center: this.zoom_to_coordinate_mappings[region.slug],
                     zoom: 9,
                     duration: 1000,
-                });
+                }
+
+                if ( this.isSM || this.isXS ) {
+                    ease_to_config.zoom = 8,
+                    ease_to_config.center = [
+                        this.zoom_to_coordinate_mappings[region.slug][0],
+                        this.zoom_to_coordinate_mappings[region.slug][1] - 0.5
+                    ]
+                }
+
+                this.map.easeTo(ease_to_config);
 
                 const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
 
@@ -241,11 +266,22 @@ export default {
             }
 
             this.selectedRegionSlug = region.slug;
-            this.map.easeTo({
+            
+            let ease_to_config = {
                 center: this.zoom_to_coordinate_mappings[region.slug],
                 zoom: 9,
                 duration: 1000,
-            });
+            }
+
+            if ( this.isSM || this.isXS ) {
+                ease_to_config.zoom = 8,
+                ease_to_config.center = [
+                    this.zoom_to_coordinate_mappings[region.slug][0] + 0.3,
+                    this.zoom_to_coordinate_mappings[region.slug][1] - 0.3
+                ]
+            }
+
+            this.map.easeTo(ease_to_config);
 
             const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
 
