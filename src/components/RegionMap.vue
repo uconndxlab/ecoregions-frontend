@@ -314,10 +314,12 @@ export default {
                     offset: [-5, -15]
                 }).setText(loc.title.rendered)
 
-                new mapboxgl.Marker(el)
+                const m = new mapboxgl.Marker(el)
                     .setLngLat([loc.longitude, loc.latitude])
                     .setPopup(pop)
                     .addTo(this.map);
+
+                this.markers.push(m)
 
                 if ( loc.slug == this.startLocation ) {
                     startLocObj = loc
