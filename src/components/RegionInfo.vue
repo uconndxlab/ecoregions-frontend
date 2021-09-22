@@ -32,7 +32,7 @@
             <div class="step-overview step" v-if="step == 1">
                 <h6 class="text-h6 mb-6">Overview</h6>
                 <div v-html="$options.filters.cleanContent(region.overview)" class="overview text-body-1"></div>
-                <v-btn class="mt-5" @click="exploreVisitAction()"
+                <v-btn class="mt-6" @click="exploreVisitAction()"
                     >Explore &amp; Visit</v-btn
                 >
             </div>

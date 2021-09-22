@@ -33,27 +33,31 @@
                             <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
 
                             <div v-if="!contentIsGeneral && ct.title === 'Conversations With'" class="tab-content">
-                                <v-row
-                                    v-for="conv in content_location.conversations"
-                                    :key="`conv-${conv.id}`"
-                                >
-                                    <v-col md="6">
-                                        <p class="speaker-byline">{{ conv.speaker }}</p>
-                                        <h3>{{ conv.post_title }}</h3>
-                                        <div class="limited-height" v-html="$options.filters.cleanContent(conv.post_content)"></div>
-                                    </v-col>
-                                    <v-col md="6">
-                                        <iframe
-                                            v-if="conv.video_link"
-                                            width="560"
-                                            height="315"
-                                            :src="youtubeEmbedLink(conv.video_link)"
-                                            frameborder="0"
-                                            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                                            allowfullscreen
-                                        ></iframe>
-                                    </v-col>
-                                </v-row>
+                                <template v-for="(conv, index) in content_location.conversations">
+                                    <v-row
+                                        
+                                        :key="`conv-${conv.id}`"
+                                    >
+                                        <v-col md="6">
+                                            <p class="speaker-byline">{{ conv.speaker }}</p>
+                                            <h3>{{ conv.post_title }}</h3>
+                                            <div class="limited-height" v-html="$options.filters.cleanContent(conv.post_content)"></div>
+                                        </v-col>
+                                        <v-col md="6">
+                                            <iframe
+                                                v-if="conv.video_link"
+                                                width="560"
+                                                height="315"
+                                                :src="youtubeEmbedLink(conv.video_link)"
+                                                frameborder="0"
+                                                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                                                allowfullscreen
+                                            ></iframe>
+                                        </v-col>
+                                    </v-row>
+
+                                    <v-divider :key="`convdiv-${conv.id}`" v-if="index < content_location.conversations.length - 1" />
+                                </template>
 
                                 <v-row v-if="!content_location.conversations">
                                     <v-col>
@@ -63,17 +67,21 @@
                             </div>
 
                             <div v-if="!contentIsGeneral && ct.title === 'Further Your Exploration'" class="tab-content">
-                                <v-row
-                                    v-for="expl in content_location.explorations"
-                                    :key="`expl-${expl.id}`"
+                                <template
+                                    v-for="(expl, index) in content_location.explorations"
                                 >
-                                    <v-col md="4">
-                                        <h3>{{ expl.post_title }}</h3>
-                                    </v-col>
-                                    <v-col md="8">
-                                        <div v-html="$options.filters.cleanContent(expl.post_content)"></div>
-                                    </v-col>
-                                </v-row>
+                                    <v-row
+                                        :key="`expl-${expl.id}`"
+                                    >
+                                        <v-col md="4" cols="12">
+                                            <h3>{{ expl.post_title }}</h3>
+                                        </v-col>
+                                        <v-col md="8" cols="12">
+                                            <div v-html="$options.filters.cleanContent(expl.post_content)"></div>
+                                        </v-col>
+                                    </v-row>
+                                    <v-divider :key="`expldiv-${expl.id}`" v-if="index < content_location.explorations.length - 1" />
+                                </template>
 
                                 <v-row v-if="!content_location.explorations">
                                     <v-col>
@@ -190,6 +198,7 @@ export default {
 
 .tab-content {
     padding: 50px 0;
+    min-height: 400px;
 }
 
 .tab-content-container {
@@ -249,6 +258,9 @@ export default {
 
     .tab-content {
         padding-top: 10px;
+        h3 {
+            margin-bottom: 16px;
+        }
     }
 }
 </style>
