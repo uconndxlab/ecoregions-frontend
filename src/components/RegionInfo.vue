@@ -204,7 +204,7 @@ export default {
     max-height: 51%;
 }
 
-.region-info-flyout .step-overview {
+.region-info-flyout .step-overview, .region-info-flyout .step-location-description {
     height: 90%;
     max-height: 90%;
 }
