@@ -9,7 +9,7 @@
                 flat
             >
                 <v-img
-                    max-width="150"
+                    max-width="100"
                     max-height="50"
                     src="@/assets/images/csmnh_logo_verytiny.jpg"
                     contain
@@ -36,6 +36,12 @@ export default {
         font-weight: 600;
         font-size: 18px;
         line-height: 21px;
+
+        @media #{map-get($display-breakpoints, 'md-and-down')} {
+            font-size: 14px;
+            white-space:normal;
+            text-overflow: initial;
+        }
     }
 }
 </style>
