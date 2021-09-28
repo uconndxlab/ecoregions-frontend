@@ -38,12 +38,12 @@
                                         
                                         :key="`conv-${conv.id}`"
                                     >
-                                        <v-col md="6">
+                                        <v-col md="6" cols="12">
                                             <p class="speaker-byline">{{ conv.speaker }}</p>
                                             <h3>{{ conv.post_title }}</h3>
                                             <div class="limited-height" v-html="$options.filters.cleanContent(conv.post_content)"></div>
                                         </v-col>
-                                        <v-col md="6">
+                                        <v-col md="6" cols="12">
                                             <iframe
                                                 v-if="conv.video_link"
                                                 width="560"
@@ -266,6 +266,23 @@ export default {
 </style>
 
 <style lang="scss">
+.wp-block-columns {
+    h1,h2,h3,h4,h5,h6 {
+        margin-bottom: 24px;
+    }
+
+    @each $size, $props in $headings {
+        #{$size} {
+            font-size: #{map-get($props, 'size')};
+            font-weight: #{map-get($props, 'weight')};
+            line-height: #{map-get($props, 'line-height')};
+            font-family: #{map-get($props, 'font-family')};
+        }
+    }
+}
+
+
+
 @media #{map-get($display-breakpoints, 'md-and-down')} {
     .content-tabs-tabselect {
         .v-slide-group__content {
