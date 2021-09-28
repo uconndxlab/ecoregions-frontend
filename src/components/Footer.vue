@@ -13,7 +13,8 @@
                 </v-col>
                 <v-col md="6" cols="12" class="mb-8" align="center">
                     <v-img
-                        max-width="210"
+                        max-width="300"
+                        lazy
                         src="@/assets/images/csmnh_logo.png"
                     />
                 </v-col>
