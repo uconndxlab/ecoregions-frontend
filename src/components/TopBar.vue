@@ -1,13 +1,25 @@
 <template>
-    <v-app-bar
-        color="white"
-        max-height="82"
-        class="ecoregions-top-bar"
-    >
-        <v-container>
-            <v-toolbar-title class="ecoregions-top-bar-title">Connecticut State Museum of Natural History&nbsp;&nbsp;|&nbsp;&nbsp;University of Connecticut</v-toolbar-title>
+    <v-sheet>
+        <v-container class="pa-0">
+            <v-app-bar
+                color="white"
+                max-height="90"
+                height="82"
+                class="ecoregions-top-bar"
+                flat
+            >
+                <v-img
+                    max-width="150"
+                    max-height="50"
+                    src="@/assets/images/csmnh_logo_verytiny.jpg"
+                    contain
+                    class="ecoregions-top-bar-icon"
+                />
+                    
+                <v-toolbar-title class="ecoregions-top-bar-title ml-2">Connecticut State Museum of Natural History&nbsp;&nbsp;|&nbsp;&nbsp;University of Connecticut</v-toolbar-title>
+            </v-app-bar>
         </v-container>
-    </v-app-bar>
+    </v-sheet>
 </template>
 
 <script>
