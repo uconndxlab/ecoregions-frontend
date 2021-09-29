@@ -245,6 +245,22 @@ export default {
 }
 </style>
 
+<style lang="scss">
+.region-info-flyout {
+    .flyout-content {
+        .step {
+            &.step-location-description {
+                hr {
+                    margin-top: 20px;
+                    margin-bottom: 20px;
+                    border-color: rgba(255, 255, 255, .3);
+                }
+            }
+        }
+    }
+}
+</style>
+
 <style lang="scss" scoped>
 @media #{map-get($display-breakpoints, 'md-and-down')} {
     .region-info-flyout {

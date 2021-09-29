@@ -43,7 +43,8 @@
                                             <h3>{{ conv.post_title }}</h3>
                                             <div class="limited-height" v-html="$options.filters.cleanContent(conv.post_content)"></div>
                                         </v-col>
-                                        <v-col md="6" cols="12">
+                                        <v-spacer></v-spacer>
+                                        <v-col md="5" cols="12">
                                             <iframe
                                                 v-if="conv.video_link"
                                                 width="560"
@@ -72,6 +73,7 @@
                                 >
                                     <v-row
                                         :key="`expl-${expl.id}`"
+                                        class="exploration-content-row mt-6 mb-3"
                                     >
                                         <v-col md="4" cols="12">
                                             <h3>{{ expl.post_title }}</h3>
@@ -269,6 +271,14 @@ export default {
 .tab-content {
     h1,h2,h3,h4,h5,h6 {
         margin-bottom: 24px;
+    }
+
+    ul,ol {
+        margin-bottom: 20px;
+    }
+
+    li {
+        line-height: 32px;
     }
 
     @each $size, $props in $headings {
