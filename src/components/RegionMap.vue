@@ -59,7 +59,7 @@ export default {
         initialMapConfig() {
             let map_config = {
                 container: "main-mapbox",
-                style: "mapbox://styles/mapbox/outdoors-v11",
+                style: "mapbox://styles/mapbox/satellite-v9",
                 center: [-72.7457, 41.6215],
                 zoom: 8,
             }
@@ -126,6 +126,8 @@ export default {
                         this.onInitializedWithLocation()
                     }
                 }
+
+                this.addEcoregionsRasterOverlay()
             });
         },
         addMapPolygon(region, coordinates) {
@@ -377,6 +379,27 @@ export default {
                 this.$refs.region_info.goBackFromPopstate()
             }
             
+        },
+
+        addEcoregionsRasterOverlay() {
+            this.map.addSource('ecoregions-raster', {
+                'type': 'image',
+                'url': '/img/ecoregions_notowns_whitechromad.png',
+                'coordinates': [
+                    [ -73.81504408634417, 42.092473886621255], // Top Left
+                    [ -71.47298451603167, 42.092473886621255], // Top Right
+                    [ -71.47298451603167, 40.71956334270866], // Bottom Right
+                    [ -73.81504408634417, 40.71956334270866], // Bottom Left
+                ]
+            })
+            this.map.addLayer({
+                id: 'ecoregions-raster-layer',
+                type: 'raster',
+                source: 'ecoregions-raster',
+                paint: {
+                    'raster-fade-duration': 0
+                }
+            })
         }
     },
     mounted() {
