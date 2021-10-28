@@ -42,7 +42,8 @@ export default {
                 // "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
             },
             selectedRegionSlug: "",
-            markers: []
+            markers: [],
+            showTowns: true
         };
     },
     computed: {
@@ -59,7 +60,7 @@ export default {
         initialMapConfig() {
             let map_config = {
                 container: "main-mapbox",
-                style: "mapbox://styles/mapbox/satellite-v9",
+                style: "mapbox://styles/uconndxgroup/ckvb5m4qm0q0v14qs76jitlc6",
                 center: [-72.7457, 41.6215],
                 zoom: 8,
             }
@@ -127,7 +128,11 @@ export default {
                     }
                 }
 
-                this.addEcoregionsRasterOverlay()
+                // this.addEcoregionsRasterOverlay()
+
+                this.addTownLabels()
+
+                this.describeLayers()
             });
         },
         addMapPolygon(region, coordinates) {
@@ -400,6 +405,24 @@ export default {
                     'raster-fade-duration': 0
                 }
             })
+        },
+
+        describeLayers() {
+            console.log(this.map.getSource('fixed-clean-2xbu8z'))
+            console.log(this.map.getLayer('ct-town-county-shapes'))
+        },
+
+        addTownLabels() {
+            if ( this.showTowns ) {
+                // let id = 'fixed-clean-2xbu8z'
+                console.log(this.map.getSource('composite'))
+                console.log(this.map.getSource('uconndxgroup.85w0ilii'))
+                // this.map.addLayer({
+                //     id: 'townLabels',
+                //     type: 'symbol',
+                //     source: ''
+                // })
+            }
         }
     },
     mounted() {
