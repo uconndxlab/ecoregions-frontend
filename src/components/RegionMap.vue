@@ -120,7 +120,7 @@ export default {
                     });
 
                     if ( start_region_obj && start_region_obj.slug ) {
-                        this.onRegionClick(start_region_obj)
+                        this.navigateToRegion(start_region_obj.slug)
                     }
 
                     if ( this.startLocation ) {
@@ -176,9 +176,7 @@ export default {
                     return false;
                 }
 
-                if ( window.location.pathname !== '/region/' + region.slug ) {
-                    history.pushState({}, null, '/region/' + region.slug)
-                }
+                this.$router.push('/region/' + region.slug)
 
                 this.selectedRegionSlug = region.slug;
 
@@ -263,15 +261,21 @@ export default {
             }
         },
         onRegionClick(region) {
+            this.$router.push(`/region/${region.slug}`)
+        },
+        navigateToRegion(region_slug) {
             if ( this.selectedRegionSlug ) {
                 return false;
             }
 
+            const region = this.regions.find(x => x.slug == region_slug)
+
+            if ( !region ) {
+                return;
+            }
+
             let startLocObj = null
 
-            if ( window.location.pathname !== '/region/' + region.slug && !this.startLocation ) {
-                history.pushState({}, null, '/region/' + region.slug)
-            }
 
             this.selectedRegionSlug = region.slug;
             
@@ -351,6 +355,7 @@ export default {
                 if ( location && Array.isArray(location.region) && location.region.length > 0 ) {
                     const region = this.regions.find( x => x.id == location.region[0] )
                     if ( region ) {
+                        console.log('navigating for on initialized with location')
                         this.onRegionClick(region)
                     }
                 }
@@ -378,10 +383,6 @@ export default {
                 });
                 this.$refs.region_info.closeFlyout()
                 this.$emit('mapRestoreIntroductoryContent')
-            }
-            
-            if ( window.location.pathname.includes('/region/') ) {
-                this.$refs.region_info.goBackFromPopstate()
             }
             
         },
@@ -428,10 +429,17 @@ export default {
     mounted() {
         this.fetchMinimumData();
         this.initializeMap();
-        window.addEventListener('popstate', this.restoreMapIntroduction)
     },
-    beforeDestroy() {
-        window.removeEventListener('popstate', this.restoreMapIntroduction)
+    watch: {
+        '$route.path': function(val) {
+            console.log('$route.path changed')
+            if ( val === '/' ) {
+                this.restoreMapIntroduction()
+            } else if ( val.startsWith('/region') ) {
+                console.log('navigating to region')
+                this.navigateToRegion(this.$route.params.region)
+            }
+        }
     }
 };
 </script>

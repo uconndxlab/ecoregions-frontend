@@ -32,6 +32,8 @@
                         <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
                             <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
 
+                            <region-list></region-list>
+
                             <div v-if="!contentIsGeneral && ct.title === 'Conversations With'" class="tab-content">
                                 <template v-for="(conv, index) in content_location.conversations">
                                     <v-row
@@ -108,9 +110,13 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import LocationList from '@/components/LocationList.vue'
+import RegionList from '@/components/RegionList.vue'
 
 export default {
-    components: { LocationList },
+    components: { 
+        LocationList,
+        RegionList
+    },
     props: {
         requests: Array
     },

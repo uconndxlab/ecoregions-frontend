@@ -48,9 +48,7 @@ export default {
             const l = this.locations.find(e => slug === e.slug)
             if ( l ) {
                 this.setContentTabs(l)
-                if ( window.location.pathname !== '/location/' + l.slug ) {
-                    history.pushState({}, null, '/location/' + l.slug)
-                }
+                this.$router.push('/location/' + l.slug)
             }
         }
     },
