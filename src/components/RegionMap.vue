@@ -49,7 +49,8 @@ export default {
     computed: {
         ...mapGetters({
             regions: "getRegions",
-            locations: "getLocations"
+            locations: "getLocations",
+            geologicalFeatures: "getGeologicalFeatures"
         }),
         isSM() {
             return this.$vuetify.breakpoint.name === 'sm'
@@ -78,6 +79,7 @@ export default {
         ...mapActions({
             fetchRegions: "fetchRegions",
             fetchLocations: "fetchLocations",
+            fetchGeologicalFeatures: "fetchGeologicalFeatures"
         }),
         ...mapMutations({
             setTabContent: "SET_CONTENT_LOCATION"
@@ -97,6 +99,14 @@ export default {
                     .catch((err) => {
                         console.log(err);
                     });
+            }
+
+            if ( Array.isArray(this.geologicalFeatures) && !this.geologicalFeatures.length) {
+                this.fetchGeologicalFeatures()
+                    .then(() => {})
+                    .catch((err) => {
+                        console.log(err)
+                    })
             }
         },
         initializeMap() {

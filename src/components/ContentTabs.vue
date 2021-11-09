@@ -31,11 +31,13 @@
                     <v-tabs-items v-model="current_tab">
                         <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
                             <v-row v-if="contentIsGeneral">
-                                <v-col cols="9">
-                                    <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
+                                <v-col cols="12" md="9">
+                                    <div v-html="ct.content" class="tab-content pr-10" v-if="contentIsGeneral"></div>
                                 </v-col>
-                                <v-col>
+                                <v-col cols="12" md="3">
                                     <region-list></region-list>
+
+                                    <geological-feature-list></geological-feature-list>
                                 </v-col>
                             </v-row>
                             
@@ -119,11 +121,13 @@
 import { mapGetters, mapActions } from 'vuex'
 import LocationList from '@/components/LocationList.vue'
 import RegionList from '@/components/RegionList.vue'
+import GeologicalFeatureList from '@/components/GeologicalFeatureList.vue'
 
 export default {
     components: { 
         LocationList,
-        RegionList
+        RegionList,
+        GeologicalFeatureList
     },
     props: {
         requests: Array
