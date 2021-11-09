@@ -99,7 +99,6 @@ export default {
             return "region-info-flyout hidden";
         },
         progressBar() {
-            // return (this.step + 1) * 25
             if ( this.step > 2 ) {
                 return 100
             }
@@ -161,7 +160,6 @@ export default {
                 if ( step === 0 ) {
                     this.$router.push('/')
                     this.emitHomeMapStateEvent()
-                    
                 }
             }
         }

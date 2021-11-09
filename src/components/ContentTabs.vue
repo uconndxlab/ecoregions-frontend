@@ -30,9 +30,17 @@
                 <v-col>
                     <v-tabs-items v-model="current_tab">
                         <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
-                            <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
+                            <v-row v-if="contentIsGeneral">
+                                <v-col cols="9">
+                                    <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
+                                </v-col>
+                                <v-col>
+                                    <region-list></region-list>
+                                </v-col>
+                            </v-row>
+                            
 
-                            <region-list></region-list>
+                            
 
                             <div v-if="!contentIsGeneral && ct.title === 'Conversations With'" class="tab-content">
                                 <template v-for="(conv, index) in content_location.conversations">
