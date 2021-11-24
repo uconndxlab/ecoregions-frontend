@@ -42,13 +42,15 @@ export default {
                 // "northwestern-uplands": [-73.22635185546915, 41.77735469268558],
             },
             selectedRegionSlug: "",
-            markers: []
+            markers: [],
+            showTowns: true
         };
     },
     computed: {
         ...mapGetters({
             regions: "getRegions",
-            locations: "getLocations"
+            locations: "getLocations",
+            geologicalFeatures: "getGeologicalFeatures"
         }),
         isSM() {
             return this.$vuetify.breakpoint.name === 'sm'
@@ -59,7 +61,7 @@ export default {
         initialMapConfig() {
             let map_config = {
                 container: "main-mapbox",
-                style: "mapbox://styles/mapbox/outdoors-v11",
+                style: "mapbox://styles/uconndxgroup/ckvb5m4qm0q0v14qs76jitlc6",
                 center: [-72.7457, 41.6215],
                 zoom: 8,
             }
@@ -77,6 +79,7 @@ export default {
         ...mapActions({
             fetchRegions: "fetchRegions",
             fetchLocations: "fetchLocations",
+            fetchGeologicalFeatures: "fetchGeologicalFeatures"
         }),
         ...mapMutations({
             setTabContent: "SET_CONTENT_LOCATION"
@@ -96,6 +99,14 @@ export default {
                     .catch((err) => {
                         console.log(err);
                     });
+            }
+
+            if ( Array.isArray(this.geologicalFeatures) && !this.geologicalFeatures.length) {
+                this.fetchGeologicalFeatures()
+                    .then(() => {})
+                    .catch((err) => {
+                        console.log(err)
+                    })
             }
         },
         initializeMap() {
@@ -119,13 +130,19 @@ export default {
                     });
 
                     if ( start_region_obj && start_region_obj.slug ) {
-                        this.onRegionClick(start_region_obj)
+                        this.navigateToRegion(start_region_obj.slug)
                     }
 
                     if ( this.startLocation ) {
                         this.onInitializedWithLocation()
                     }
                 }
+
+                this.addEcoregionsRasterOverlay()
+
+                this.addTownLabels()
+
+                this.describeLayers()
             });
         },
         addMapPolygon(region, coordinates) {
@@ -169,9 +186,7 @@ export default {
                     return false;
                 }
 
-                if ( window.location.pathname !== '/region/' + region.slug ) {
-                    history.pushState({}, null, '/region/' + region.slug)
-                }
+                this.$router.push('/region/' + region.slug)
 
                 this.selectedRegionSlug = region.slug;
 
@@ -256,15 +271,21 @@ export default {
             }
         },
         onRegionClick(region) {
+            this.$router.push(`/region/${region.slug}`)
+        },
+        navigateToRegion(region_slug) {
             if ( this.selectedRegionSlug ) {
                 return false;
             }
 
+            const region = this.regions.find(x => x.slug == region_slug)
+
+            if ( !region ) {
+                return;
+            }
+
             let startLocObj = null
 
-            if ( window.location.pathname !== '/region/' + region.slug && !this.startLocation ) {
-                history.pushState({}, null, '/region/' + region.slug)
-            }
 
             this.selectedRegionSlug = region.slug;
             
@@ -344,6 +365,7 @@ export default {
                 if ( location && Array.isArray(location.region) && location.region.length > 0 ) {
                     const region = this.regions.find( x => x.id == location.region[0] )
                     if ( region ) {
+                        console.log('navigating for on initialized with location')
                         this.onRegionClick(region)
                     }
                 }
@@ -373,19 +395,62 @@ export default {
                 this.$emit('mapRestoreIntroductoryContent')
             }
             
-            if ( window.location.pathname.includes('/region/') ) {
-                this.$refs.region_info.goBackFromPopstate()
+        },
+
+        addEcoregionsRasterOverlay() {
+            this.map.addSource('ecoregions-raster', {
+                'type': 'image',
+                'url': '/img/ecoregions_notowns_whitechromad.png',
+                'coordinates': [
+                    [ -73.81504408634417, 42.092473886621255], // Top Left
+                    [ -71.47298451603167, 42.092473886621255], // Top Right
+                    [ -71.47298451603167, 40.71956334270866], // Bottom Right
+                    [ -73.81504408634417, 40.71956334270866], // Bottom Left
+                ]
+            })
+            this.map.addLayer({
+                id: 'ecoregions-raster-layer',
+                type: 'raster',
+                source: 'ecoregions-raster',
+                paint: {
+                    'raster-fade-duration': 0,
+                    'raster-opacity': 0.5
+                }
+            })
+        },
+
+        describeLayers() {
+            console.log(this.map.getSource('fixed-clean-2xbu8z'))
+            console.log(this.map.getLayer('ct-town-county-shapes'))
+        },
+
+        addTownLabels() {
+            if ( this.showTowns ) {
+                // let id = 'fixed-clean-2xbu8z'
+                console.log(this.map.getSource('composite'))
+                console.log(this.map.getSource('uconndxgroup.85w0ilii'))
+                // this.map.addLayer({
+                //     id: 'townLabels',
+                //     type: 'symbol',
+                //     source: ''
+                // })
             }
-            
         }
     },
     mounted() {
         this.fetchMinimumData();
         this.initializeMap();
-        window.addEventListener('popstate', this.restoreMapIntroduction)
     },
-    beforeDestroy() {
-        window.removeEventListener('popstate', this.restoreMapIntroduction)
+    watch: {
+        '$route.path': function(val) {
+            console.log('$route.path changed')
+            if ( val === '/' ) {
+                this.restoreMapIntroduction()
+            } else if ( val.startsWith('/region') ) {
+                console.log('navigating to region')
+                this.navigateToRegion(this.$route.params.region)
+            }
+        }
     }
 };
 </script>

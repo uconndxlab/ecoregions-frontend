@@ -99,7 +99,6 @@ export default {
             return "region-info-flyout hidden";
         },
         progressBar() {
-            // return (this.step + 1) * 25
             if ( this.step > 2 ) {
                 return 100
             }
@@ -144,9 +143,7 @@ export default {
             this.setContentLocation(location)
             this.step = 3
             locationEventBus.$emit('location-selected', location)
-            if ( window.location.pathname !== '/location/' + location.slug ) {
-                history.pushState({}, null, '/location/' + location.slug)
-            }
+            this.$router.push('/location/' + location.slug)
         },
         goBack() {
             if ( this.step > 1 ) {
@@ -157,20 +154,13 @@ export default {
             if ( step < this.step ) {
                 this.step = step
                 if ( step === 1 ) {
-                    history.pushState({}, null, '/region/' + this.region.slug)
+                    this.$router.push('/region/' + this.region.slug)
                 }
 
                 if ( step === 0 ) {
-                    history.pushState({}, null, '/')
+                    this.$router.push('/')
                     this.emitHomeMapStateEvent()
-                    
                 }
-            }
-        },
-        goBackFromPopstate() {
-            if ( window.location.pathname.includes('/region/') ) {
-                // navigating to region, just go back.
-                this.goBack()
             }
         }
     },

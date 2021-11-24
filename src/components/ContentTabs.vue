@@ -30,7 +30,19 @@
                 <v-col>
                     <v-tabs-items v-model="current_tab">
                         <v-tab-item v-for="ct in content_tabs" :key="`tabcontent-` + ct.title">
-                            <div v-html="ct.content" class="tab-content" v-if="contentIsGeneral"></div>
+                            <v-row v-if="contentIsGeneral">
+                                <v-col cols="12" md="9">
+                                    <div v-html="ct.content" class="tab-content pr-10" v-if="contentIsGeneral"></div>
+                                </v-col>
+                                <v-col cols="12" md="3">
+                                    <region-list></region-list>
+
+                                    <geological-feature-list></geological-feature-list>
+                                </v-col>
+                            </v-row>
+                            
+
+                            
 
                             <div v-if="!contentIsGeneral && ct.title === 'Conversations With'" class="tab-content">
                                 <template v-for="(conv, index) in content_location.conversations">
@@ -108,9 +120,15 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import LocationList from '@/components/LocationList.vue'
+import RegionList from '@/components/RegionList.vue'
+import GeologicalFeatureList from '@/components/GeologicalFeatureList.vue'
 
 export default {
-    components: { LocationList },
+    components: { 
+        LocationList,
+        RegionList,
+        GeologicalFeatureList
+    },
     props: {
         requests: Array
     },
