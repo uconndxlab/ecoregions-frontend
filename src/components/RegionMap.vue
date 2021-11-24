@@ -138,7 +138,7 @@ export default {
                     }
                 }
 
-                // this.addEcoregionsRasterOverlay()
+                this.addEcoregionsRasterOverlay()
 
                 this.addTownLabels()
 
@@ -413,7 +413,8 @@ export default {
                 type: 'raster',
                 source: 'ecoregions-raster',
                 paint: {
-                    'raster-fade-duration': 0
+                    'raster-fade-duration': 0,
+                    'raster-opacity': 0.5
                 }
             })
         },
