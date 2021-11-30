@@ -9,7 +9,7 @@
                             <a :href="link.link">{{ link.title }}</a>
                         </li>
                     </ul>
-                    <v-btn class="mt-4" color="primary">Donate to the MNH</v-btn>
+                    <v-btn class="mt-4" color="primary">Donate to the CSMNH</v-btn>
                 </v-col>
                 <v-col md="6" cols="12" class="mb-8" align="center">
                     <v-img

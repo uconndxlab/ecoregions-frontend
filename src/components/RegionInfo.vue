@@ -4,7 +4,7 @@
             <v-btn
                 text
                 @click="goBack()"
-                :disabled="step < 2"
+                :disabled="step < 1"
                 color="white"
                 class="mb-6"
             >
@@ -22,12 +22,16 @@
             <v-progress-linear
                 color="primary"
                 height="19"
-                v-model="progressBar"
+                :value="progressBar"
                 class="mb-7"
             ></v-progress-linear>
 
-            <h1 v-if="region.name && step < 3" class="mb-4 text-h4">{{ region.name }}</h1>
-            <p v-if="region.flavor_text && step < 3" class="mb-8">{{ region.flavor_text }}</p>
+            <h1 v-if="region.name && step < 3 && step > 0" class="mb-4 text-h4">{{ region.name }}</h1>
+            <p v-if="region.flavor_text && step < 3 && step > 0" class="mb-8">{{ region.flavor_text }}</p>
+
+            <div class="step step-home" v-if="step == 0">
+                <div class="overview text-body-1" v-if="introContent" v-html="$options.filters.cleanContent(introContent.content)"></div>
+            </div>
 
             <div class="step-overview step" v-if="step == 1">
                 <h6 class="text-h6 mb-6">Overview</h6>
@@ -72,13 +76,13 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import locationEventBus from '@/events/locationEventBus'
 
 export default {
     data: () => {
         return {
-            open: false,
+            open: true,
             region: {
                 name: "",
                 flavor_text: "",
@@ -90,7 +94,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            content_location: 'getContentLocation'
+            content_location: 'getContentLocation',
+            content_tabs: 'getContentTabs'
         }),
         objclass() {
             if (this.open) {
@@ -103,11 +108,25 @@ export default {
                 return 100
             }
             return ((this.step + 1) * 25) - 15
+        },
+        introContent() {
+            if ( this.content_tabs && this.content_tabs.length ) {
+                const content = this.content_tabs.find((x) => {
+                    return x.title === 'Introduction'
+                })
+                if ( content ) {
+                    return content
+                }
+            }
+            return false
         }
     },
     methods: {
         ...mapMutations({
             setContentLocation: 'SET_CONTENT_LOCATION'
+        }),
+        ...mapActions({
+            fetchPageContent: 'fetchPageContent'
         }),
         openFlyout(region, locations) {
             this.region = region;
@@ -146,14 +165,14 @@ export default {
             this.$router.push('/location/' + location.slug)
         },
         goBack() {
-            if ( this.step > 1 ) {
+            if ( this.step > 0 ) {
                 this.navigateToStep(this.step - 1)
             }
         },
         navigateToStep(step) {
             if ( step < this.step ) {
                 this.step = step
-                if ( step === 1 ) {
+                if ( step === 1 || step === 2 ) {
                     this.$router.push('/region/' + this.region.slug)
                 }
 
@@ -194,7 +213,11 @@ export default {
     max-height: 51%;
 }
 
-.region-info-flyout .step-overview, .region-info-flyout .step-location-description {
+.region-info-flyout .step-home .overview {
+    max-height: 81%;
+}
+
+.region-info-flyout .step-overview, .region-info-flyout .step-location-description, .region-info-flyout .step-home {
     height: 90%;
     max-height: 90%;
 }
@@ -244,6 +267,16 @@ export default {
                     margin-top: 20px;
                     margin-bottom: 20px;
                     border-color: rgba(255, 255, 255, .3);
+                }
+            }
+
+            .overview {
+                h2 {
+                    margin-bottom: 16px;
+                }
+
+                .wp-block-embed {
+                    margin-bottom: 16px;
                 }
             }
         }

@@ -122,27 +122,39 @@ export default new Vuex.Store({
             }
             return false
         },
-        async fetchPageContentForTabs({ commit }, requests = [] ) {
+        async fetchPageContentForTabs({ commit, dispatch }, requests = [] ) {
+            const content_response = await dispatch('fetchPageContent', requests)
+
+            if ( content_response ) {
+                console.log(requests)
+                console.log(content_response)
+                commit('SET_CONTENT_TABS', content_response)
+                return true
+            }
+            return false
+        },
+        async fetchPageContent(context, requests = []) {
             if ( requests.length > 0 ) {
                 let request_slug_string = requests.join(',')
-                let tab_objects = requests
+                let content_keys = requests
+                let content = []
+
                 try {
                     const url = ecoconstants.API_URL + '/pages?slug=' + request_slug_string
                     const resp = await axios.get(url)
+
                     if ( resp && resp.data ) {
                         resp.data.forEach((p) => {
-                            const i = requests.indexOf(p.slug)
+                            const i = content_keys.indexOf(p.slug)
                             if ( i > -1 ) {
-                                tab_objects[i] = {
+                                content[i] = {
                                     title: p.title.rendered,
                                     content: p.content.rendered
                                 }
                             }
-                            
                         })
-                        commit('SET_CONTENT_TABS', tab_objects)
-                        return true
                     }
+                    return content
                 } catch (error) {
                     console.error(error)
                     return false
