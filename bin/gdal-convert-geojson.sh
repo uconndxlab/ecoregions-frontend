@@ -1,0 +1,1 @@
+docker run -v /Users/bk/dx/ecoregions-frontend/bin/data:/opt/geojson osgeo/gdal:latest ogr2ogr -f GeoJSON -lco RFC7946=YES /opt/geojson/fixed.json /opt/geojson/data.json

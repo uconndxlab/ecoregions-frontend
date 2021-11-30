@@ -62,7 +62,7 @@ export default {
             let map_config = {
                 container: "main-mapbox",
                 style: "mapbox://styles/uconndxgroup/ckvb5m4qm0q0v14qs76jitlc6",
-                center: [-72.7457, 41.6215],
+                center: [-73.3457, 41.6215],
                 zoom: 8,
             }
 
@@ -391,7 +391,7 @@ export default {
                     zoom: this.initialMapConfig.zoom,
                     duration: 1000,
                 });
-                this.$refs.region_info.closeFlyout()
+                this.$refs.region_info.navigateToStep(0)
                 this.$emit('mapRestoreIntroductoryContent')
             }
             
@@ -503,7 +503,7 @@ export default {
     display: inline-block;
     position: absolute;
     top: 30px;
-    left: 30px;
+    right: 30px;
     z-index: 1;
     padding-left: 35px;
     padding-right: 35px;
