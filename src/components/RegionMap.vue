@@ -62,7 +62,7 @@ export default {
             let map_config = {
                 container: "main-mapbox",
                 style: "mapbox://styles/uconndxgroup/ckvb5m4qm0q0v14qs76jitlc6",
-                center: [-73.3457, 41.6215],
+                center: [-73.6457, 41.5215],
                 zoom: 8,
             }
 
@@ -138,7 +138,9 @@ export default {
                     }
                 }
 
-                this.addEcoregionsRasterOverlay()
+                // this.addEcoregionsRasterOverlay()
+
+                // this.addGeologicalFeaturesRaster()
 
                 this.addTownLabels()
 
@@ -412,6 +414,29 @@ export default {
                 id: 'ecoregions-raster-layer',
                 type: 'raster',
                 source: 'ecoregions-raster',
+                paint: {
+                    'raster-fade-duration': 0,
+                    'raster-opacity': 0.5
+                }
+            })
+        },
+
+        addGeologicalFeaturesRaster() {
+            this.map.addSource('geological-raster-marble_valley', {
+                'type': 'image',
+                'url': '/img/marble_valley.svg',
+                'coordinates': [
+                    [ -73.81504408634417, 42.092473886621255], // Top Left
+                    [ -71.47298451603167, 42.092473886621255], // Top Right
+                    [ -71.47298451603167, 40.71956334270866], // Bottom Right
+                    [ -73.81504408634417, 40.71956334270866], // Bottom Left
+                ]
+            })
+
+            this.map.addLayer({
+                id: 'geological-raster-marble_valley-layer',
+                type: 'raster',
+                source: 'geological-raster-marble_valley',
                 paint: {
                     'raster-fade-duration': 0,
                     'raster-opacity': 0.5
