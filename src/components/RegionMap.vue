@@ -1,6 +1,21 @@
 <template>
     <div class="component-map">
         <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert>
+        <v-card style="position: absolute; bottom: 50px; right: 50px; z-index:9999;">
+            <v-card-text>
+                <v-checkbox
+                    v-model="toggleLayerState.townNames"
+                    @change="toggleLayer('townNames')"
+                    :label="`Town Names`"
+                ></v-checkbox>
+                <v-checkbox
+                    v-model="toggleLayerState.geologicalFeatures"
+                    @change="toggleLayer('geologicalFeatures')"
+                    :label="`Geological Features`"
+                ></v-checkbox>
+            </v-card-text>
+            
+        </v-card>
         <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
         <div id="main-mapbox"></div>
     </div>
@@ -43,7 +58,16 @@ export default {
             },
             selectedRegionSlug: "",
             markers: [],
-            showTowns: true
+            showTowns: true,
+            toggleLayers: {
+                townNames: 'ct-town-county-labels',
+                geologicalFeatures: ['marble-valleys', 'traprock-ridges', 'glacial-lake-deposit']
+            },
+            toggleLayerState: {
+                townNames: true,
+                geologicalFeatures: true,
+                regions: true
+            }
         };
     },
     computed: {
@@ -465,6 +489,27 @@ export default {
                 //     type: 'symbol',
                 //     source: ''
                 // })
+            }
+        },
+        toggleLayer(layerName) {
+            // this.toggleLayerState[layerName] = !this.toggleLayerState[layerName]
+            console.log(layerName)
+            console.log(this.toggleLayers[layerName])
+            console.log(this.toggleLayers)
+
+            if ( this.toggleLayerState[layerName] ) {
+                if ( Array.isArray(this.toggleLayers[layerName]) ) {
+                    this.toggleLayers[layerName].forEach(x => this.map.setLayoutProperty(x,'visibility','visible'))
+                } else {
+                    this.map.setLayoutProperty(this.toggleLayers[layerName],'visibility','visible')
+                }
+                
+            } else {
+                if ( Array.isArray(this.toggleLayers[layerName]) ) {
+                    this.toggleLayers[layerName].forEach(x => this.map.setLayoutProperty(x,'visibility','none'))
+                } else {
+                    this.map.setLayoutProperty(this.toggleLayers[layerName],'visibility','none')
+                }
             }
         }
     },
