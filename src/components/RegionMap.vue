@@ -1,6 +1,6 @@
 <template>
     <div class="component-map">
-        <v-alert class="info-alert" v-if="selectedRegionSlug === ''">Select a region to begin.</v-alert>
+        <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert>
         <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
         <div id="main-mapbox"></div>
     </div>
@@ -114,6 +114,12 @@ export default {
                 "pk.eyJ1IjoidWNvbm5keGdyb3VwIiwiYSI6ImNrcTg4dWc5NzBkcWYyd283amtpNjFiZXkifQ.iGpZ5PfDWFWWPkuDeGQ3NQ";
 
             this.map = new mapboxgl.Map(this.initialMapConfig);
+
+            // disable map zoom when using scroll
+            this.map.scrollZoom.disable();
+
+            // Add zoom and rotation controls to the map.
+            this.map.addControl(new mapboxgl.NavigationControl());
 
             this.map.on("load", () => {
                 let start_region_obj = {}
