@@ -1,6 +1,6 @@
 <template>
     <div class="component-map">
-        <v-alert class="info-alert" v-if="selectedRegionSlug === ''">Select a region to begin.</v-alert>
+        <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert>
         <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
         <div id="main-mapbox"></div>
     </div>
@@ -62,7 +62,7 @@ export default {
             let map_config = {
                 container: "main-mapbox",
                 style: "mapbox://styles/uconndxgroup/ckvb5m4qm0q0v14qs76jitlc6",
-                center: [-73.3457, 41.6215],
+                center: [-73.6457, 41.5215],
                 zoom: 8,
             }
 
@@ -115,6 +115,12 @@ export default {
 
             this.map = new mapboxgl.Map(this.initialMapConfig);
 
+            // disable map zoom when using scroll
+            this.map.scrollZoom.disable();
+
+            // Add zoom and rotation controls to the map.
+            this.map.addControl(new mapboxgl.NavigationControl());
+
             this.map.on("load", () => {
                 let start_region_obj = {}
                 if (Array.isArray(this.regions)) {
@@ -138,7 +144,9 @@ export default {
                     }
                 }
 
-                this.addEcoregionsRasterOverlay()
+                // this.addEcoregionsRasterOverlay()
+
+                // this.addGeologicalFeaturesRaster()
 
                 this.addTownLabels()
 
@@ -412,6 +420,29 @@ export default {
                 id: 'ecoregions-raster-layer',
                 type: 'raster',
                 source: 'ecoregions-raster',
+                paint: {
+                    'raster-fade-duration': 0,
+                    'raster-opacity': 0.5
+                }
+            })
+        },
+
+        addGeologicalFeaturesRaster() {
+            this.map.addSource('geological-raster-marble_valley', {
+                'type': 'image',
+                'url': '/img/marble_valley.svg',
+                'coordinates': [
+                    [ -73.81504408634417, 42.092473886621255], // Top Left
+                    [ -71.47298451603167, 42.092473886621255], // Top Right
+                    [ -71.47298451603167, 40.71956334270866], // Bottom Right
+                    [ -73.81504408634417, 40.71956334270866], // Bottom Left
+                ]
+            })
+
+            this.map.addLayer({
+                id: 'geological-raster-marble_valley-layer',
+                type: 'raster',
+                source: 'geological-raster-marble_valley',
                 paint: {
                     'raster-fade-duration': 0,
                     'raster-opacity': 0.5
