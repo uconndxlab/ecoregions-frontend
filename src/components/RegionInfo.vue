@@ -279,6 +279,12 @@ export default {
                     margin-bottom: 16px;
                 }
             }
+
+            &.step-locations {
+                max-height: 51%;
+                display: flex;
+                flex-direction: column;
+            }
         }
     }
 }

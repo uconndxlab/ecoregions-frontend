@@ -53,7 +53,7 @@
                                         <v-col md="6" cols="12">
                                             <p class="speaker-byline">{{ conv.speaker }}</p>
                                             <h3>{{ conv.post_title }}</h3>
-                                            <div class="limited-height" v-html="$options.filters.cleanContent(conv.post_content)"></div>
+                                            <div v-html="$options.filters.cleanContent(conv.post_content)"></div>
                                         </v-col>
                                         <v-spacer></v-spacer>
                                         <v-col md="5" cols="12">
@@ -69,7 +69,7 @@
                                         </v-col>
                                     </v-row>
 
-                                    <v-divider :key="`convdiv-${conv.id}`" v-if="index < content_location.conversations.length - 1" />
+                                    <v-divider :key="`convdiv-${conv.id}`"  class="mb-6" v-if="index < content_location.conversations.length - 1" />
                                 </template>
 
                                 <v-row v-if="!content_location.conversations">
