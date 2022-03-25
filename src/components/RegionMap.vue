@@ -597,7 +597,7 @@ export default {
 
 @media #{map-get($display-breakpoints, 'md-and-down')} {
     #main-mapbox {
-        min-height: 95vh;
+        min-height: 75vh;
     }
 
     .mapLayerToggle {
