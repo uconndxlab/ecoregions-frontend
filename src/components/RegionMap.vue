@@ -1,7 +1,7 @@
 <template>
     <div class="component-map">
         <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert>
-        <v-card style="position: absolute; bottom: 50px; right: 50px; z-index:9999;">
+        <v-card class="mapLayerToggle">
             <v-card-text>
                 <v-checkbox
                     v-model="toggleLayerState.townNames"
@@ -16,8 +16,9 @@
             </v-card-text>
             
         </v-card>
-        <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
         <div id="main-mapbox"></div>
+        <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
+        
     </div>
 </template>
 
@@ -587,9 +588,20 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+.mapLayerToggle {
+    z-index: 9999;
+    right: 50px;
+    position: absolute;
+    bottom: 50px;
+}
+
 @media #{map-get($display-breakpoints, 'md-and-down')} {
     #main-mapbox {
         min-height: 95vh;
+    }
+
+    .mapLayerToggle {
+        bottom: 101vh;
     }
 }
 

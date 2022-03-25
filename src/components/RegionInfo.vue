@@ -297,6 +297,8 @@ export default {
         padding-left: 20px;
         padding-right: 20px;
         padding-bottom: 20px;
+        position: relative;
+        height: 100vh;
 
         .flyout-content {
             display: flex;
