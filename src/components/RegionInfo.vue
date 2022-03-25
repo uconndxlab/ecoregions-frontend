@@ -279,6 +279,12 @@ export default {
                     margin-bottom: 16px;
                 }
             }
+
+            &.step-locations {
+                max-height: 51%;
+                display: flex;
+                flex-direction: column;
+            }
         }
     }
 }
@@ -291,6 +297,8 @@ export default {
         padding-left: 20px;
         padding-right: 20px;
         padding-bottom: 20px;
+        position: relative;
+        height: 100vh;
 
         .flyout-content {
             display: flex;
