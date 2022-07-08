@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import TopBar from '@/components/TopBar.vue'
 
 export default {
@@ -18,5 +19,19 @@ export default {
   data: () => ({
     //
   }),
+  methods: {
+    ...mapActions({
+      fetchHabitats: 'fetchHabitats',
+      fetchSubjects: 'fetchSubjects',
+      fetchExplorations: 'fetchExplorations'
+    })
+  },
+  created() {
+    Promise.all([
+      this.fetchHabitats(),
+      this.fetchSubjects(),
+      this.fetchExplorations()
+    ])
+  }
 };
 </script>
