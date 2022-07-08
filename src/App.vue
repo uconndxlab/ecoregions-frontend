@@ -23,14 +23,16 @@ export default {
     ...mapActions({
       fetchHabitats: 'fetchHabitats',
       fetchSubjects: 'fetchSubjects',
-      fetchExplorations: 'fetchExplorations'
+      fetchExplorations: 'fetchExplorations',
+      fetchRegions: 'fetchRegions'
     })
   },
   created() {
     Promise.all([
       this.fetchHabitats(),
       this.fetchSubjects(),
-      this.fetchExplorations()
+      this.fetchExplorations(),
+      this.fetchRegions()
     ])
   }
 };

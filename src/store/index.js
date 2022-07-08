@@ -101,6 +101,14 @@ export default new Vuex.Store({
                 }
                 return false
             })
+        },
+        getSelectedExplorationRegion(state) {
+            return state.regions.filter(x => {
+                if ( state.selected_exploration?.region ) {
+                    return state.selected_exploration?.region.includes(x.id)
+                }
+                return false
+            })
         }
     },
     mutations: {

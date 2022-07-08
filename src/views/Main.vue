@@ -38,6 +38,18 @@
                         <v-chip v-for="s in selectedExplorationSubjects" :key="`subj-chip-${s.id}`" class="mr-2">{{ s.name }}</v-chip>
                     </v-col>
                 </v-row>
+
+                <v-row v-if="selectedExplorationRegion.length > 0">
+                    <v-col>
+                        Regions: <v-chip v-for="r in selectedExplorationRegion" :key="`reg-chip-${r.id}`">{{ r.name }}</v-chip>
+                    </v-col>
+                </v-row>
+
+                <v-row v-if="selectedExploration.site && selectedExploration.site.length > 0">
+                    <v-col>
+                        Site: {{ selectedExploration.site[0].post_title }}
+                    </v-col>
+                </v-row>
                 <v-row>
                     <v-col>
                         <div v-html="explorationContent" class="exploration-content-box"></div>
@@ -74,7 +86,8 @@ export default {
             explorations: 'getExplorations',
             selectedExploration: 'getSelectedExploration',
             selectedExplorationHabitats: 'getSelectedExplorationHabitats',
-            selectedExplorationSubjects: 'getSelectedExplorationSubjects'
+            selectedExplorationSubjects: 'getSelectedExplorationSubjects',
+            selectedExplorationRegion: 'getSelectedExplorationRegion'
         }),
         explorationTitle() {
             return this.selectedExploration?.title?.rendered
