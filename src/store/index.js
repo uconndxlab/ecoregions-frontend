@@ -22,7 +22,9 @@ const initialState = () => {
         filter: {
             subject: [],
             habitat: []
-        }
+        },
+        selected_exploration: {},
+        right_content_open: false
     }
 }
 
@@ -77,6 +79,28 @@ export default new Vuex.Store({
         },
         getFilter(state) {
             return state.filter
+        },
+        getSelectedExploration(state) {
+            return state.selected_exploration
+        },
+        getRightContentOpen(state) {
+            return state.right_content_open
+        },
+        getSelectedExplorationHabitats(state) {
+            return state.habitats.filter(x => {
+                if ( state.selected_exploration?.habitat ) {
+                    return state.selected_exploration?.habitat.includes(x.id)
+                }
+                return false
+            })
+        },
+        getSelectedExplorationSubjects(state) {
+            return state.subjects.filter(x => {
+                if ( state.selected_exploration?.subject ) {
+                    return state.selected_exploration?.subject.includes(x.id)
+                }
+                return false
+            })
         }
     },
     mutations: {
@@ -126,6 +150,13 @@ export default new Vuex.Store({
             if ( state.filter[which] ) {
                 state.filter[which] = value
             }
+        },
+        SET_SELECTED_EXPLORATION(state, exploration) {
+            state.selected_exploration = exploration
+            state.right_content_open = true
+        },
+        SET_RIGHT_CONTENT_OPEN(state, val) {
+            state.right_content_open = !!val
         }
     },
     actions: {

@@ -32,7 +32,7 @@ export default {
 
 <style>
 /* Temporarily using this for global styles.  variables.scss is for vuetify overrides and not regular styles. */
-.v-btn:not(.v-btn--round).v-size--default {
+.v-btn:not(.v-btn--round):not(.v-btn--text).v-size--default {
   padding-left: 35px;
   padding-right: 35px;
 }

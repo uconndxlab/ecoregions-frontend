@@ -70,6 +70,8 @@ export default {
 footer {
     padding: 77px 20px;
     border-top: 2px solid #E5E5E5;
+    width: 100%;
+    display: block;
 }
 
 .footer_link_list {

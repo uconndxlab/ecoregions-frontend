@@ -12,18 +12,34 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .left-content-block {
     max-height: 100%;
+    min-height: 100%;
     background: rgba(37, 59, 80, 0.9);
-    width: 50%;
+    width: 700px;
     color: white;
-    padding: 10px;
+    padding: 30px;
+    display: flex;
+    flex-direction:column;
+    position: relative;
+    
+    p, strong, li {
+        color: white;
+    }
+
+    .left-content-block-content {
+        flex-grow: 1;
+        flex-basis: 1;
+        margin-top: 125px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 }
 
-.left-content-block p,
-.left-content-block strong,
-.left-content-block li {
-    color: white;
+@media #{map-get($display-breakpoints, 'md-and-down')} {
+    .left-content-block {
+        width: 100%;
+    }
 }
 </style>

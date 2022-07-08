@@ -1,6 +1,6 @@
 <template>
     <div class="component-map">
-        <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert>
+        <!-- <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert> -->
         <v-card class="mapLayerToggle">
             <v-card-text>
                 <v-checkbox
@@ -17,7 +17,7 @@
             
         </v-card>
         <div id="main-mapbox"></div>
-        <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info>
+        <!-- <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info> -->
         
     </div>
 </template>
@@ -25,7 +25,7 @@
 <script>
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import mapboxgl from "mapbox-gl";
-import RegionInfo from '@/components/RegionInfo.vue'
+// import RegionInfo from '@/components/RegionInfo.vue'
 import locationEventBus from '@/events/locationEventBus'
 
 export default {
@@ -34,7 +34,7 @@ export default {
         startLocation: String
     },
     components: {
-        RegionInfo
+        // RegionInfo
     },
     data: () => {
         return {
@@ -537,7 +537,7 @@ export default {
 /* For some reason, the above causes issues in some ad blockers (uBlock Origin).  It tries to throw like custom analytics events which prevents load. */
 @import "https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css";
 #main-mapbox {
-    min-height: 800px;
+    min-height: 100%;
 }
 
 .circle {
@@ -568,7 +568,12 @@ export default {
 }
 
 .component-map {
-    position: relative;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 0;
 }
 </style>
 
@@ -589,7 +594,7 @@ export default {
 
 <style lang="scss" scoped>
 .mapLayerToggle {
-    z-index: 9999;
+    z-index: 3;
     right: 50px;
     position: absolute;
     bottom: 50px;
