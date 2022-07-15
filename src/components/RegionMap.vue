@@ -1,6 +1,5 @@
 <template>
     <div class="component-map">
-        <!-- <v-alert class="info-alert mr-4" v-if="selectedRegionSlug === ''">Select an Ecoregion to begin.</v-alert> -->
         <v-card class="mapLayerToggle">
             <v-card-text>
                 <v-checkbox
@@ -14,27 +13,21 @@
                     :label="`Geological Features`"
                 ></v-checkbox>
             </v-card-text>
-            
         </v-card>
         <div id="main-mapbox"></div>
-        <!-- <region-info ref="region_info" @locationListHighlight="listHighlightEvent" @locationListDeHighlight="listDeHighlightEvent" @homeMapStateRequested="restoreMapIntroduction"></region-info> -->
-        
     </div>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import mapboxgl from "mapbox-gl";
-// import RegionInfo from '@/components/RegionInfo.vue'
 import locationEventBus from '@/events/locationEventBus'
+import { getPopupHTML } from '@/utils/popup'
 
 export default {
     props: {
         startRegion: String,
         startLocation: String
-    },
-    components: {
-        // RegionInfo
     },
     data: () => {
         return {
@@ -83,18 +76,36 @@ export default {
         isXS() {
             return this.$vuetify.breakpoint.name === 'xs'
         },
+        isMD() {
+            return this.$vuetify.breakpoint.name === 'md'
+        },
         initialMapConfig() {
+            // Lets do some estimating where we might best place the center/zoom.
+            // At under lg size currently, map is now covered.  We probably need to focus on it being in the center, and zoom in a bit more.
+            // At lg and up, map is no longer covered.  Needs to be to the rightish.  Zoom out a bit more.
+
+            // 8 zoom is like slightly too close on just lg
             let map_config = {
                 container: "main-mapbox",
                 style: "mapbox://styles/uconndxgroup/ckvb5m4qm0q0v14qs76jitlc6",
-                center: [-73.6457, 41.5215],
-                zoom: 8,
+                center: [-74.0457, 41.5915],
+                zoom: 7.5,
             }
 
             // Slightly change the configuration for default display on a vertical mobile device.
-            if ( this.isSM || this.isXS ) {
+            if ( this.isXS ) {
                 map_config.zoom = 7
-                map_config.center = [-72.7457, 41.3]
+                map_config.center = [-72.7457, 41.6]
+            }
+
+            if ( this.isSM ) {
+                map_config.zoom = 7.5
+                map_config.center = [-72.7457, 41.6]
+            }
+
+            if ( this.isMD ) {
+                map_config.zoom = 7.7
+                map_config.center = [-72.7457, 41.66]
             }
 
             return map_config
@@ -134,6 +145,58 @@ export default {
                     })
             }
         },
+        onMapLoad() {
+            if (Array.isArray(this.regions)) {
+                this.regions.forEach((region) => {
+                    const coords = this.region_coordinate_mappings[region.slug]
+                    if (coords) {
+                        this.addMapPolygon(region, coords);
+                    }
+                })
+            }
+            
+            this.addTownLabels()
+
+            this.describeLayers()
+
+            this.initializeMarkers()
+        },
+        onMapRegionClick(region) {
+            this.selectedRegionSlug = region.slug;
+
+            let ease_to_config = {
+                center: this.zoom_to_coordinate_mappings[region.slug],
+                zoom: 9,
+                duration: 1000,
+            }
+
+            if ( this.isSM || this.isXS ) {
+                ease_to_config.zoom = 8,
+                ease_to_config.center = this.getMobileAdjustedCenterForRegion(region.slug)
+            }
+
+            this.map.easeTo(ease_to_config);
+
+            const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
+
+            // this.setTabContent(locationsInRegion[0])
+            locationEventBus.$emit('region-selected', region)
+            // this.$refs.region_info.openFlyout(region, locationsInRegion)
+
+            const all_marker_elements = document.querySelectorAll(`[data-locationid="*"]`)
+            all_marker_elements.forEach(x => {
+                x.style.display = 'none'
+            })
+
+            locationsInRegion.forEach((loc) => {
+                const elements = document.querySelectorAll(`[data-locationid="${loc.id}"]`)
+                elements.forEach(x => {
+                    x.style.display = 'initial'
+                })
+            })
+            
+            return true
+        },
         initializeMap() {
             mapboxgl.accessToken =
                 "pk.eyJ1IjoidWNvbm5keGdyb3VwIiwiYSI6ImNrcTg4dWc5NzBkcWYyd283amtpNjFiZXkifQ.iGpZ5PfDWFWWPkuDeGQ3NQ";
@@ -146,37 +209,7 @@ export default {
             // Add zoom and rotation controls to the map.
             this.map.addControl(new mapboxgl.NavigationControl());
 
-            this.map.on("load", () => {
-                let start_region_obj = {}
-                if (Array.isArray(this.regions)) {
-                    this.regions.forEach((region) => {
-                        const coords =
-                            this.region_coordinate_mappings[region.slug];
-                        if ( this.startRegion && region.slug === this.startRegion ) {
-                            start_region_obj = region
-                        }
-                        if (coords) {
-                            this.addMapPolygon(region, coords);
-                        }
-                    });
-
-                    if ( start_region_obj && start_region_obj.slug ) {
-                        this.navigateToRegion(start_region_obj.slug)
-                    }
-
-                    if ( this.startLocation ) {
-                        this.onInitializedWithLocation()
-                    }
-                }
-
-                // this.addEcoregionsRasterOverlay()
-
-                // this.addGeologicalFeaturesRaster()
-
-                this.addTownLabels()
-
-                this.describeLayers()
-            });
+            this.map.on("load", this.onMapLoad);
         },
         addMapPolygon(region, coordinates) {
             const outline_id = region.slug + "_outline";
@@ -214,75 +247,7 @@ export default {
             });
 
             // Can pass 'event' to this callback function, for access to clicked properties such as event.lngLat
-            this.map.on("click", region.slug, () => {
-                if ( this.selectedRegionSlug ) {
-                    return false;
-                }
-
-                this.$router.push('/region/' + region.slug)
-
-                this.selectedRegionSlug = region.slug;
-
-                let ease_to_config = {
-                    center: this.zoom_to_coordinate_mappings[region.slug],
-                    zoom: 9,
-                    duration: 1000,
-                }
-
-                if ( this.isSM || this.isXS ) {
-                    ease_to_config.zoom = 8,
-                    ease_to_config.center = this.getMobileAdjustedCenterForRegion(region.slug)
-                }
-
-                this.map.easeTo(ease_to_config);
-
-                const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
-
-                this.setTabContent(locationsInRegion[0])
-                locationEventBus.$emit('region-selected', region)
-                this.$refs.region_info.openFlyout(region, locationsInRegion)
-
-                locationsInRegion.forEach((loc) => {
-                    const circle = document.createElement("div");
-                    circle.className = "circle";
-
-                    const inner_circle = document.createElement("div");
-                    inner_circle.className = "inner_circle";
-                    
-                    circle.appendChild(inner_circle);
-
-                    // Marker container.
-                    const el = document.createElement("div");
-                    el.appendChild(circle);
-                    el.className = "marker";
-                    el.style.width = "30px";
-                    el.style.height = "30px";
-                    el.dataset.locationid = loc.id
-
-                    el.addEventListener('mouseenter', () => {
-                        el.classList.add('highlighted')
-                        this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
-                    })
-
-                    el.addEventListener('mouseleave', () => {
-                        el.classList.remove('highlighted')
-                        this.$refs.region_info.setHighlight(-1)
-                    })
-
-                    const pop = new mapboxgl.Popup({
-                        offset: [-5, -15]
-                    }).setText(loc.title.rendered)
-
-                    const m = new mapboxgl.Marker(el)
-                        .setLngLat([loc.longitude, loc.latitude])
-                        .setPopup(pop)
-                        .addTo(this.map);
-
-                    this.markers.push(m)
-                });
-                
-                return true
-            })
+            this.map.on("click", region.slug, (e) => this.onMapRegionClick(region, e))
         },
         getLocationsInRegion(region_id) {
             return Array.from(
@@ -317,79 +282,7 @@ export default {
                 return;
             }
 
-            let startLocObj = null
-
-
-            this.selectedRegionSlug = region.slug;
-            
-            let ease_to_config = {
-                center: this.zoom_to_coordinate_mappings[region.slug],
-                zoom: 9,
-                duration: 1000,
-            }
-
-            if ( this.isSM || this.isXS ) {
-                ease_to_config.zoom = 8,
-                ease_to_config.center = this.getMobileAdjustedCenterForRegion(region.slug)
-            }
-
-            this.map.easeTo(ease_to_config);
-
-            const locationsInRegion = this.$store.getters.getLocationsForRegion( region.id );
-
-            locationsInRegion.forEach((loc) => {
-                const circle = document.createElement("div");
-                circle.className = "circle";
-
-                const inner_circle = document.createElement("div");
-                inner_circle.className = "inner_circle";
-                
-                circle.appendChild(inner_circle);
-
-                // Marker container.
-                const el = document.createElement("div");
-                el.appendChild(circle);
-                el.className = "marker";
-                el.style.width = "30px";
-                el.style.height = "30px";
-                el.dataset.locationid = loc.id
-
-                el.addEventListener('mouseenter', () => {
-                    el.classList.add('highlighted')
-                    this.$refs.region_info.setHighlight(this.locations.indexOf(loc))
-                })
-
-                el.addEventListener('mouseleave', () => {
-                    el.classList.remove('highlighted')
-                    this.$refs.region_info.setHighlight(-1)
-                })
-
-                const pop = new mapboxgl.Popup({
-                    offset: [-5, -15]
-                }).setText(loc.title.rendered)
-
-                const m = new mapboxgl.Marker(el)
-                    .setLngLat([loc.longitude, loc.latitude])
-                    .setPopup(pop)
-                    .addTo(this.map);
-
-                this.markers.push(m)
-
-                if ( loc.slug == this.startLocation ) {
-                    startLocObj = loc
-                }
-            });
-
-            if ( !this.startLocation && !startLocObj ) {
-                this.setTabContent(locationsInRegion[0])
-                locationEventBus.$emit('region-selected', region)
-                this.$refs.region_info.openFlyout(region, locationsInRegion)
-            } else {
-                locationEventBus.$emit('region-selected', region)
-                this.$refs.region_info.openFlyoutWithLocation(region, locationsInRegion, startLocObj)
-            }
-            
-            return true
+            this.onMapRegionClick(region)
         },
 
         onInitializedWithLocation() {
@@ -512,6 +405,48 @@ export default {
                     this.map.setLayoutProperty(this.toggleLayers[layerName],'visibility','none')
                 }
             }
+        },
+        initializeMarkers() {
+            this.locations.forEach((loc) => {
+                const circle = document.createElement("div")
+                circle.className = "circle"
+
+                const inner_circle = document.createElement("div")
+                inner_circle.className = "inner_circle"
+                
+                circle.appendChild(inner_circle)
+
+                // Marker container.
+                const el = document.createElement("div")
+                el.appendChild(circle)
+                el.className = "marker"
+                el.style.width = "30px"
+                el.style.height = "30px"
+                el.style.display = 'none'
+                el.dataset.locationid = loc.id
+
+                el.addEventListener('mouseenter', () => {
+                    el.classList.add('highlighted')
+                })
+
+                el.addEventListener('mouseleave', () => {
+                    el.classList.remove('highlighted')
+                })
+
+                const popupHTML = getPopupHTML({
+                    title: loc.title.rendered
+                })
+                const pop = new mapboxgl.Popup({
+                    offset: [-5, -15]
+                }).setHTML(popupHTML)
+
+                const m = new mapboxgl.Marker(el)
+                    .setLngLat([loc.longitude, loc.latitude])
+                    .setPopup(pop)
+                    .addTo(this.map);
+
+                this.markers.push(m)
+            })
         }
     },
     mounted() {
