@@ -21,7 +21,9 @@ const initialState = () => {
         explorations: [],
         filter: {
             subject: [],
-            habitat: []
+            habitat: [],
+            region: [],
+            site: []
         },
         selected_exploration: {},
         right_content_open: false
@@ -109,6 +111,26 @@ export default new Vuex.Store({
                 }
                 return false
             })
+        },
+        getSpecificityOptions(state) {
+            const ecoregion_options = state.regions.map(x => {
+                return {
+                    name: x.name,
+                    value: `region-${x.id}`
+                }
+            })
+
+            const site_options = state.locations.map(x => {
+                if ( x.site && x.site.length > 0 ) {
+                    const site_id = x.site[0]
+                    return {
+                        name: x.title.rendered,
+                        value: `site-${site_id}`
+                    }
+                }
+            })
+
+            return [...ecoregion_options, ...site_options]
         }
     },
     mutations: {
@@ -308,6 +330,19 @@ export default new Vuex.Store({
 
         async changeFilter({ commit, dispatch }, { value, which }) {
             commit('SET_FILTER', { value, which })
+            return await dispatch('fetchExplorations', true)
+        },
+
+        async changeFilters({ commit, dispatch }, filters) {
+            filters.forEach(x => {
+                if ( x.which && x.value ) {
+                    commit('SET_FILTER', { 
+                        value: x.value,
+                        which: x.which
+                    })
+                }
+            })
+
             return await dispatch('fetchExplorations', true)
         }
     }

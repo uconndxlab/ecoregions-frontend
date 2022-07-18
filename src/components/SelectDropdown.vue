@@ -38,6 +38,11 @@ export default {
         return {
             selected: []
         }
+    },
+    methods: {
+        select(value) {
+            this.selected = [value]
+        }
     }
 }
 </script>

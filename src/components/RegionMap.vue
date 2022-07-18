@@ -115,7 +115,8 @@ export default {
         ...mapActions({
             fetchRegions: "fetchRegions",
             fetchLocations: "fetchLocations",
-            fetchGeologicalFeatures: "fetchGeologicalFeatures"
+            fetchGeologicalFeatures: "fetchGeologicalFeatures",
+            changeFilter: "changeFilter"
         }),
         ...mapMutations({
             setTabContent: "SET_CONTENT_LOCATION"
@@ -154,10 +155,6 @@ export default {
                     }
                 })
             }
-            
-            this.addTownLabels()
-
-            this.describeLayers()
 
             this.initializeMarkers()
         },
@@ -193,6 +190,12 @@ export default {
                 elements.forEach(x => {
                     x.style.display = 'initial'
                 })
+            })
+
+            this.$emit('regionClick', region)
+            this.changeFilter({
+                value: [region.id],
+                which: 'region'
             })
             
             return true
@@ -268,9 +271,6 @@ export default {
                 list[i].classList.remove('highlighted');
             }
         },
-        onRegionClick(region) {
-            this.$router.push(`/region/${region.slug}`)
-        },
         navigateToRegion(region_slug) {
             if ( this.selectedRegionSlug ) {
                 return false;
@@ -283,19 +283,6 @@ export default {
             }
 
             this.onMapRegionClick(region)
-        },
-
-        onInitializedWithLocation() {
-            if ( this.startLocation ) {
-                const location = this.locations.find( x => x.slug == this.startLocation )
-                if ( location && Array.isArray(location.region) && location.region.length > 0 ) {
-                    const region = this.regions.find( x => x.id == location.region[0] )
-                    if ( region ) {
-                        console.log('navigating for on initialized with location')
-                        this.onRegionClick(region)
-                    }
-                }
-            }
         },
 
         getMobileAdjustedCenterForRegion(region_slug) {
@@ -367,24 +354,6 @@ export default {
                 }
             })
         },
-
-        describeLayers() {
-            console.log(this.map.getSource('fixed-clean-2xbu8z'))
-            console.log(this.map.getLayer('ct-town-county-shapes'))
-        },
-
-        addTownLabels() {
-            if ( this.showTowns ) {
-                // let id = 'fixed-clean-2xbu8z'
-                console.log(this.map.getSource('composite'))
-                console.log(this.map.getSource('uconndxgroup.85w0ilii'))
-                // this.map.addLayer({
-                //     id: 'townLabels',
-                //     type: 'symbol',
-                //     source: ''
-                // })
-            }
-        },
         toggleLayer(layerName) {
             // this.toggleLayerState[layerName] = !this.toggleLayerState[layerName]
             console.log(layerName)
@@ -447,6 +416,19 @@ export default {
 
                 this.markers.push(m)
             })
+
+            const els = document.querySelectorAll('[data-site-action-id="*"]')
+            console.log(els)
+            for (let index = 0; index < els.length; index++) {
+                const element = els[index];
+                element.addEventListener("click", (e) => {
+                    const id = e.dataset.siteActionId
+                    this.changeFilter({
+                        which: 'site',
+                        value: [id]
+                    })
+                })
+            }
         }
     },
     mounted() {

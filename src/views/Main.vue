@@ -1,7 +1,7 @@
 <template>
     <div class="page-main">
         <div class="map-container">
-            <region-map />
+            <region-map @regionClick="regionClick" />
             <left-content-block>
                 <div class="top-filter">
                     <v-row>
@@ -12,6 +12,10 @@
                         <v-col>
                             <p>Habitat</p>
                             <select-dropdown :change="filterChangeHabitats" :items="habitats" :label="'Habitat'" />
+                        </v-col>
+                        <v-col>
+                            <p>Specificity</p>
+                            <select-dropdown :items="specificityOptions"  :change="filterSpecificity" :label="`Specificity`" ref="specificity_filter_dropdown" />
                         </v-col>
                     </v-row>
                 </div>
@@ -62,7 +66,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import EcoregionsFooter from '@/components/Footer.vue'
 import LeftContentBlock from '@/components/LeftContentBlock.vue'
 import RightContentBlock from '@/components/RightContentBlock.vue'
@@ -87,8 +91,17 @@ export default {
             selectedExploration: 'getSelectedExploration',
             selectedExplorationHabitats: 'getSelectedExplorationHabitats',
             selectedExplorationSubjects: 'getSelectedExplorationSubjects',
-            selectedExplorationRegion: 'getSelectedExplorationRegion'
+            selectedExplorationRegion: 'getSelectedExplorationRegion',
+            specificityOptions: 'getSpecificityOptions',
         }),
+        filterSpecificityValue: {
+            get() {
+                return this.getFilterSpecificityValue
+            },
+            set(v) {
+                this.setFilterSpecificityValue(v)
+            }
+        },
         explorationTitle() {
             return this.selectedExploration?.title?.rendered
         },
@@ -97,9 +110,38 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            changeFilter: 'changeFilter'
+        ...mapMutations({
+            setFilterSpecificityValue: 'SET_FILTER_SPECIFICITY_VALUE'
         }),
+        ...mapActions({
+            changeFilter: 'changeFilter',
+            changeFilters: 'changeFilters'
+        }),
+        async filterSpecificity(v) {
+            const filters = {
+                site: [],
+                region: []
+            }
+            for (let index = 0; index < v.length; index++) {
+                const element = v[index]
+                
+                const [which, value] = element.split('-')
+                if ( filters[which] ) {
+                    filters[which].push(value)
+                }
+            }
+
+            await this.changeFilters([
+                {
+                    which: 'site',
+                    value: filters.site
+                },
+                {
+                    which: 'region',
+                    value: filters.region
+                }
+            ])
+        },
         filterChangeSubjects(v) {
             this.filterChanged(v, 'subject')
         },
@@ -113,6 +155,9 @@ export default {
             })
 
             console.log(result)
+        },
+        regionClick(region) {
+            this.$refs.specificity_filter_dropdown.select(`region-${region.id}`)
         }
     }
 }
