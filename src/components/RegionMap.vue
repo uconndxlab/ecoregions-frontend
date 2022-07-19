@@ -159,6 +159,10 @@ export default {
             this.initializeMarkers()
         },
         onMapRegionClick(region) {
+            if ( this.selectedRegionSlug === region.slug ) {
+                // we might already be here.
+                return
+            }
             this.selectedRegionSlug = region.slug;
 
             let ease_to_config = {
@@ -402,8 +406,15 @@ export default {
                     el.classList.remove('highlighted')
                 })
 
+                const location_category_reference_id = 
+                    ( Array.isArray(loc.site) && loc.site.length > 0 ) ?
+                        loc.site[0] :
+                        null
+
                 const popupHTML = getPopupHTML({
-                    title: loc.title.rendered
+                    title: loc.title.rendered,
+                    site_id: location_category_reference_id,
+                    location_id: loc.id
                 })
                 const pop = new mapboxgl.Popup({
                     offset: [-5, -15]
@@ -417,16 +428,22 @@ export default {
                 this.markers.push(m)
             })
 
-            const els = document.querySelectorAll('[data-site-action-id="*"]')
-            console.log(els)
-            for (let index = 0; index < els.length; index++) {
-                const element = els[index];
-                element.addEventListener("click", (e) => {
-                    const id = e.dataset.siteActionId
-                    this.changeFilter({
-                        which: 'site',
-                        value: [id]
-                    })
+            const map_element = document.getElementById('main-mapbox')
+            map_element.addEventListener("click", this.onSiteClicked)
+        },
+        onSiteClicked(event) {
+            const is_filter_btn = event.target.className.includes('filter-btn')
+            const site_id = event.target.dataset.siteActionId
+            const location_id = event.target.dataset.locationId
+            if ( is_filter_btn && site_id && location_id ) {
+                const loc = this.locations.find(x => x.id == location_id)
+                console.log(this.locations)
+                console.log(loc)
+                console.log(location_id)
+                this.$emit('siteFilter', loc)
+                this.changeFilter({
+                    which: 'site',
+                    value: [event.target.dataset.siteActionId]
                 })
             }
         }

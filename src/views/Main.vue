@@ -1,7 +1,7 @@
 <template>
     <div class="page-main">
         <div class="map-container">
-            <region-map @regionClick="regionClick" />
+            <region-map @regionClick="regionClick" @siteFilter="siteFilter" />
             <left-content-block>
                 <div class="top-filter">
                     <v-row>
@@ -158,6 +158,14 @@ export default {
         },
         regionClick(region) {
             this.$refs.specificity_filter_dropdown.select(`region-${region.id}`)
+        },
+        siteFilter(site) {
+            console.log(site)
+            const location_category_reference_id = 
+                    ( Array.isArray(site.site) && site.site.length > 0 ) ?
+                        site.site[0] :
+                        null
+            this.$refs.specificity_filter_dropdown.select(`site-${location_category_reference_id}`)
         }
     }
 }
