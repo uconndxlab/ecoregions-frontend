@@ -42,6 +42,9 @@ export default {
     methods: {
         select(value) {
             this.selected = [value]
+        },
+        clear() {
+            this.selected = []
         }
     }
 }

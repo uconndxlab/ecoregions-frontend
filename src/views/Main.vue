@@ -1,19 +1,19 @@
 <template>
     <div class="page-main">
         <div class="map-container">
-            <region-map @regionClick="regionClick" @siteFilter="siteFilter" />
+            <region-map @regionClick="regionClick" @siteFilter="siteFilter" ref="region_map" />
             <left-content-block>
                 <div class="top-filter">
                     <v-row>
-                        <v-col>
+                        <v-col cols="4">
                             <p>Subject</p>
-                            <select-dropdown :change="filterChangeSubjects" :items="subjects" :label="'Subject'" />
+                            <select-dropdown :change="filterChangeSubjects" :items="subjects" :label="'Subject'" ref="subject_filter_dropdown" />
                         </v-col>
-                        <v-col>
+                        <v-col cols="4">
                             <p>Habitat</p>
-                            <select-dropdown :change="filterChangeHabitats" :items="habitats" :label="'Habitat'" />
+                            <select-dropdown :change="filterChangeHabitats" :items="habitats" :label="'Habitat'" ref="habitat_filter_dropdown" />
                         </v-col>
-                        <v-col>
+                        <v-col cols="4">
                             <p>Specificity</p>
                             <select-dropdown :items="specificityOptions"  :change="filterSpecificity" :label="`Specificity`" ref="specificity_filter_dropdown" />
                         </v-col>
@@ -25,6 +25,10 @@
                     <v-col>
                         <div class="exploration-list">
                             <exploration-item v-for="expl in explorations" :key="`ex-${expl.id}`" :exploration="expl" />
+                        </div>
+                        <div class="exploration-list text-center" v-if="explorations.length === 0">
+                            <p class="text-center">There are no results.</p>
+                            <v-btn @click="clearFiltersButton">Clear Filters</v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -115,7 +119,8 @@ export default {
         }),
         ...mapActions({
             changeFilter: 'changeFilter',
-            changeFilters: 'changeFilters'
+            changeFilters: 'changeFilters',
+            clearFilters: 'clearFilters'
         }),
         async filterSpecificity(v) {
             const filters = {
@@ -160,12 +165,18 @@ export default {
             this.$refs.specificity_filter_dropdown.select(`region-${region.id}`)
         },
         siteFilter(site) {
-            console.log(site)
             const location_category_reference_id = 
                     ( Array.isArray(site.site) && site.site.length > 0 ) ?
                         site.site[0] :
                         null
             this.$refs.specificity_filter_dropdown.select(`site-${location_category_reference_id}`)
+        },
+        clearFiltersButton() {
+            this.$refs.specificity_filter_dropdown.clear()
+            this.$refs.habitat_filter_dropdown.clear()
+            this.$refs.subject_filter_dropdown.clear()
+            this.$refs.region_map.clearSelectedRegion()
+            this.clearFilters()
         }
     }
 }

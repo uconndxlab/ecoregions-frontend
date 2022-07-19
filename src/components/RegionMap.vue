@@ -446,6 +446,9 @@ export default {
                     value: [event.target.dataset.siteActionId]
                 })
             }
+        },
+        clearSelectedRegion() {
+            this.selectedRegionSlug = ''
         }
     },
     mounted() {
@@ -508,6 +511,36 @@ export default {
     bottom: 0;
     top: 0;
     z-index: 0;
+}
+
+.marker-popup {
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    padding: 16px 10px;
+}
+
+.mapboxgl-popup-close-button {
+    font-size: 25px;
+    padding-right: 2px;
+    padding-top: 2px;
+}
+
+.marker-popup .filter-btn {
+    align-items: center;
+    appearance: button;
+    background-color: rgb(106, 161, 64);
+    border-color: rgb(106, 161, 64);
+    border-radius: 33px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+    height: 40px;
+    line-height: 24px;
+    min-width: 71px;
+    outline-color: rgb(255, 255, 255);
+    padding: 0px 35px;
+    text-align: center;
 }
 </style>
 

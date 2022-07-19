@@ -181,6 +181,14 @@ export default new Vuex.Store({
                 state.filter[which] = value
             }
         },
+        CLEAR_FILTER(state) {
+            state.filter = {
+                subject: [],
+                habitat: [],
+                region: [],
+                site: []
+            }
+        },
         SET_SELECTED_EXPLORATION(state, exploration) {
             state.selected_exploration = exploration
             state.right_content_open = true
@@ -344,6 +352,11 @@ export default new Vuex.Store({
             })
 
             return await dispatch('fetchExplorations', true)
+        },
+
+        async clearFilters({ commit, dispatch }) {
+            commit('CLEAR_FILTER')
+            return await dispatch('fetchExplorations')
         }
     }
 })
